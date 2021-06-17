@@ -27,6 +27,9 @@ export default {
     },
   },
   methods: {
+    // TODO: now anther method - bring all notes to top
+    // TODO: now anther method - donate link
+    // Indicator for notes offscreen?
     toggleStickies: () => {
       // https://stackoverflow.com/questions/45179138/sending-message-from-popup-to-content-script-chrome-extension
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
