@@ -1,12 +1,15 @@
 <template>
-  <hello-world />
+  <div>
+    <p>standalone</p>
+    <!-- <PopupMenu /> -->
+  </div>
 </template>
 
 <script>
-import HelloWorld from '@/components/HelloWorld.vue';
+import PopupMenu from '@/components/PopupMenu.vue';
 
 export default {
   name: 'App',
-  components: { HelloWorld },
+  // components: { PopupMenu },
 };
 </script>

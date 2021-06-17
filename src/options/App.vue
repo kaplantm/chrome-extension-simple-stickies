@@ -1,13 +1,14 @@
 <template>
-  <hello-world />
+  <!-- TODO: option form domain / path / query param specificity  -->
+  <p>options</p>
 </template>
 
 <script>
-import HelloWorld from '@/components/HelloWorld.vue';
+// import PopupMenu from '@/components/PopupMenu.vue';
 
 export default {
   name: 'App',
-  components: { HelloWorld },
+  // components: { PopupMenu },
 };
 </script>
 

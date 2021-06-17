@@ -1,19 +1,18 @@
 <template>
-  <hello-world />
+  <PopupMenu />
 </template>
 
 <script>
-import HelloWorld from '@/components/HelloWorld.vue';
+import PopupMenu from '@/components/PopupMenu.vue';
 
 export default {
   name: 'App',
-  components: { HelloWorld },
+  components: { PopupMenu },
 };
 </script>
 
 <style>
 html {
-  width: 400px;
-  height: 400px;
+  background-color: hsla(0, 0%, 96%, 1);
 }
 </style>
