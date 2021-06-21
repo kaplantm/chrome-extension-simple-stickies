@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import StickiesManager from '@/components/StickiesManager.vue';
+import StickiesManager from '@/components/StickiesManager/index.vue';
 
 export default {
   name: 'App',
@@ -15,7 +15,7 @@ export default {
 
 <style lang="scss">
 #simpleStickiesChromeAppWrapper {
-  border: 3px solid red;
+  // border: 3px solid red;
   position: absolute;
   top: 0;
   left: 0;
@@ -24,5 +24,6 @@ export default {
 }
 * {
   box-sizing: border-box;
+  font-family: sans-serif;
 }
 </style>

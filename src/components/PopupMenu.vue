@@ -1,54 +1,82 @@
 <template>
   <div class="popupWrapper">
-    <button class="popupButton" role="button" v-on:click="toggleStickies">
+    <button
+      class="popupButton"
+      role="button"
+      v-on:click="toggleStickies"
+      v-if="hasStickies"
+    >
       Toggle Stickies
     </button>
     <button class="popupButton" role="button" v-on:click="newSticky">
       New Sticky
     </button>
-    <button class="popupButton" role="button" v-on:click="viewAll">
+    <!-- <button class="popupButton" role="button" v-on:click="viewAll">
       View All Simple Stickies
     </button>
     <button class="popupButton" role="button" v-on:click="options">
       Options
-    </button>
+    </button> -->
   </div>
 </template>
 
 <script>
+import { getStickiesFromStorage } from '../content-scripts/lib/storageUtils';
+
 export default {
   name: 'PopupMenu',
-  mounted() {
-    browser.runtime.sendMessage({});
+  created() {
+    // get initial stickies asynchronously
+    this.initialize();
   },
   computed: {
     defaultText() {
       return browser.i18n.getMessage('extName');
     },
   },
+  data() {
+    return {
+      hasStickies: false,
+    };
+  },
   methods: {
+    initialize() {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const url = new URL(tabs[0].url);
+        const domain = url.hostname;
+        getStickiesFromStorage(domain).then((data) => {
+          console.log('before', {
+            data,
+            lco: window.location.hostname,
+            tab: tabs[0],
+          });
+          this.hasStickies = data?.stickies?.length;
+        });
+      });
+    },
     // TODO: now anther method - bring all notes to top
     // TODO: now anther method - donate link
     // Indicator for notes offscreen?
     toggleStickies: () => {
+      // TODO: only show if has stickies for page
       // https://stackoverflow.com/questions/45179138/sending-message-from-popup-to-content-script-chrome-extension
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        console.log({ tabs });
         chrome.tabs.sendMessage(tabs[0].id, { type: 'toggleStickies' });
       });
+      window.close();
     },
     newSticky: () => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        console.log({ tabs });
         chrome.tabs.sendMessage(tabs[0].id, { type: 'newSticky' });
       });
+      window.close();
     },
-    viewAll: () => {
-      chrome.runtime.sendMessage({ type: 'tabUrl', data: './index.html' });
-    },
-    options: () => {
-      chrome.runtime.sendMessage({ type: 'tabUrl', data: './options.html' });
-    },
+    // viewAll: () => { // how to do this? local storage is site specific
+    //   chrome.runtime.sendMessage({ type: 'tabUrl', data: './index.html' });
+    // },
+    // options: () => {
+    //   chrome.runtime.sendMessage({ type: 'tabUrl', data: './options.html' });
+    // },
   },
 };
 </script>
