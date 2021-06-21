@@ -46,9 +46,10 @@ const getDefaultSticky = (partial = {}) => ({
 });
 
 export function getNewSticky(count) {
+  const scroll = document.documentElement.scrollTop || document.body.scrollTop;
   const partial = {
     initialX: defaultSticky.initialX + 20 * Math.floor(count + 1 / 10),
-    initialY: defaultSticky.initialY + 25 * count,
+    initialY: defaultSticky.initialY + 25 * count + scroll,
   };
   return getDefaultSticky(partial);
 }

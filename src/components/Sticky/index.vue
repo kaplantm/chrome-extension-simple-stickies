@@ -39,8 +39,7 @@ export default {
   name: 'Sticky',
   components: { VueDraggableResizable },
   props: {
-    // TODO: now just get id and get rest from storage
-    // TODO: now custom font
+    // TODO: now custom fonts?
     id: Number,
     initialX: Number,
     initialY: Number,
@@ -181,6 +180,9 @@ $border-rad: 3px;
   border-bottom-left-radius: $border-rad;
   border-bottom-right-radius: $border-rad;
   resize: none;
+  color: black;
+  font-size: 1rem;
+  margin: 0;
   &:focus {
     outline: none;
   }

@@ -1,5 +1,5 @@
 <template>
-  <!-- TODO: option form domain / path / query param specificity  -->
+  <!-- TODO: options for domain / path / query param specificity  -->
   <p>options</p>
 </template>
 

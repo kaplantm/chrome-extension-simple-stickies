@@ -52,6 +52,7 @@ export default {
           });
           this.hasStickies = data?.stickies?.length;
         });
+        chrome.tabs.sendMessage(tabs[0].id, { type: 'initPopup' });
       });
     },
     // TODO: now anther method - bring all notes to top
