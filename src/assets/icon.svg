@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="155.651 164.773 237.966 236.96" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="275.403" y1="169.773" x2="275.403" y2="393.674" id="gradient-0" gradientTransform="matrix(1, 0, 0, 1, -2, 0)">
+      <stop offset="0" style="stop-color: rgb(255, 204, 0);"/>
+      <stop offset="1" style="stop-color: rgb(251, 241, 181);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="346.405" y1="343.761" x2="346.405" y2="391.936" id="gradient-1" gradientTransform="matrix(1, 0, 0, 1, 2, 4)">
+      <stop offset="0" style="stop-color: rgba(228, 210, 139, 1)"/>
+      <stop offset="1" style="stop-color: rgba(209, 178, 56, 1)"/>
+    </linearGradient>
+    <linearGradient id="gradient-3" bx:pinned="true">
+      <stop style="stop-color: rgb(255, 204, 0);" offset="0"/>
+      <stop style="stop-color: rgb(251, 241, 181);" offset="1"/>
+    </linearGradient>
+    <linearGradient id="gradient-3-0" gradientUnits="userSpaceOnUse" x1="287.407" y1="180.782" x2="287.407" y2="391.107" gradientTransform="matrix(1, 0, 0, 1, 0, 0)" xlink:href="#gradient-3"/>
+  </defs>
+  <title>12, stickey notes, reminder, office, education, stationary, stationery,</title>
+  <rect x="189.848" y="197.835" width="176.839" height="119.585" style=""/>
+  <rect x="182.245" y="180.782" width="210.325" height="210.325" style="fill: url(#gradient-3-0); stroke-linejoin: round; stroke-linecap: round; stroke-width: 9px; stroke: rgb(45, 45, 45);" transform="matrix(0.996772, 0.080286, -0.080286, 0.996772, 11.829177, -24.776684)"/>
+  <path d="M 386.138 192.033 C 386.235 190.913 385.89 189.801 385.178 188.94 C 384.47 188.067 383.448 187.518 382.339 187.414 L 182.672 169.788 C 180.378 169.593 178.361 171.317 178.162 173.644 L 160.667 376.175 C 160.571 377.294 160.916 378.407 161.628 379.268 C 162.343 380.124 163.364 380.658 164.467 380.751 L 310.063 393.674 L 314.781 338.592 C 314.883 337.467 315.424 336.429 316.284 335.711 C 317.132 334.989 318.229 334.638 319.332 334.736 L 373.403 339.524 L 386.138 192.033 Z M 282.672 225.378 L 310.742 227.826 L 309.99 236.3 L 281.921 233.852 L 282.672 225.378 Z M 306.288 261.732 L 305.578 270.206 L 245.367 264.561 L 246.077 256.087 L 306.288 261.732 Z M 207.766 218.726 L 270.397 224.277 L 269.645 232.751 L 207.056 227.158 L 207.766 218.726 Z M 226.866 296.714 L 201.294 294.696 L 202.004 286.222 L 227.575 288.24 L 226.866 296.714 Z M 233.444 263.385 L 204.217 260.8 L 204.968 252.326 L 234.196 254.91 L 233.444 263.385 Z M 280.417 301.518 L 238.664 297.789 L 239.415 289.315 L 281.169 293.001 L 280.417 301.518 Z M 343.048 307.026 L 291.992 302.238 L 292.702 293.764 L 343.758 298.552 L 343.048 307.026 Z M 345.929 273.13 L 316.702 270.545 L 317.411 262.071 L 346.639 264.656 L 345.929 273.13 Z M 348.852 239.233 L 319.624 236.649 L 320.334 228.175 L 349.562 230.759 L 348.852 239.233 Z" style="fill: url(#gradient-0); stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 7px; visibility: hidden;"/>
+  <polygon points="326.756 347.761 322.58 395.936 374.23 351.956 326.756 347.761" style="fill: url(#gradient-1); stroke-width: 7px; stroke-linejoin: round; stroke-linecap: round; stroke: rgb(0, 0, 0); visibility: hidden;"/>
+  <path d="M 199.794 213.105 C 204.879 228.388 221.257 207.071 226.587 211.446 C 231.398 215.396 235.733 223.824 243.269 222.568 C 249.806 221.478 254.736 211.55 261.715 213.876 C 266.973 215.628 268.237 222.944 274.826 223.841 C 280.904 224.668 285.41 216.301 290.673 217.392 C 297.219 218.75 301.452 227.694 308.624 228.882 C 317.605 230.371 321.387 221.233 330.112 220.149 C 336.992 219.294 339.481 229.373 345.549 231.463 C 349.817 232.933 352.939 230.146 354.959 225.646" style="fill: none; stroke-linejoin: round; stroke-linecap: round; stroke-width: 7px; stroke: rgb(45, 45, 45);"/>
+  <path d="M 197.54 249.396 C 203.929 262.089 219.004 243.361 224.333 247.736 C 229.145 251.686 233.48 260.114 241.016 258.858 C 247.553 257.768 252.483 247.84 259.462 250.166 C 264.719 251.919 265.984 259.234 272.572 260.131 C 278.651 260.959 283.157 252.591 288.42 253.683 C 294.966 255.04 299.199 263.984 306.371 265.173 C 315.352 266.661 319.134 257.523 327.858 256.439 C 334.739 255.584 337.228 265.663 343.296 267.754 C 347.564 269.224 348.563 264.739 352.706 261.937" style="fill: none; stroke-linejoin: round; stroke-linecap: round; stroke-width: 7px; stroke: rgb(45, 45, 45);"/>
+  <path d="M 193.863 284.618 C 199.586 299.901 215.327 278.583 220.656 282.958 C 225.468 286.908 229.803 295.336 237.339 294.08 C 243.876 292.99 248.806 283.062 255.785 285.388 C 261.042 287.141 262.307 294.456 268.895 295.353 C 274.974 296.181 279.48 291.317 284.743 288.905" style="fill: none; stroke-linejoin: round; stroke-linecap: round; stroke-width: 7px; stroke: rgb(45, 45, 45);"/>
+</svg>

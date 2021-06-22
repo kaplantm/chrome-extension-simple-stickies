@@ -1,6 +1,4 @@
-browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('Hello from the background');
-  console.log({ request, sender });
+browser.runtime.onMessage.addListener((request) => {
   // browser.tabs.executeScript({
   //   file: 'content-script.js',
   // });
