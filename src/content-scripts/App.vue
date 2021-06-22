@@ -15,7 +15,7 @@ export default {
 
 <style lang="scss">
 #simpleStickiesChromeAppWrapper {
-  // border: 3px solid red;
+  z-index: 10000000;
   position: absolute;
   top: 0;
   left: 0;

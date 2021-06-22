@@ -5,7 +5,6 @@ import {
 } from '../../content-scripts/lib/storageUtils';
 
 // const exampleStickyData = {
-//   // TODO: get data from local storage
 //   'https://www.google.com/': {
 //     url: 'https://www.google.com/',
 //     stickies: [

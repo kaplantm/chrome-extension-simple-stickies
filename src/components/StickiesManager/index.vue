@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="stickyManagerTestWrapper">
     <div class="stickyManagerWrapper" v-if="showStickies">
       <div v-for="item in initialStickies.stickies" :key="item.id">
         <Sticky v-bind="item" />
@@ -62,8 +62,10 @@ export default {
 </script>
 
 <style scoped>
+.stickyManagerTestWrapper {
+  z-index: 100000;
+}
 .stickyManagerWrapper {
-  /* border: 3px solid green; */
   position: absolute;
   top: 0;
   left: 0;

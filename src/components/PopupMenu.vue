@@ -25,9 +25,21 @@ import { getStickiesFromStorage } from '../content-scripts/lib/storageUtils';
 
 export default {
   name: 'PopupMenu',
-  created() {
+  beforeCreate() {
     // get initial stickies asynchronously
-    this.initialize();
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const url = new URL(tabs[0].url);
+      const domain = url.hostname;
+      getStickiesFromStorage(domain).then((data) => {
+        console.log('before', {
+          data,
+          lco: window.location.hostname,
+          tab: tabs[0],
+        });
+        this.hasStickies = data?.stickies?.length;
+      });
+      chrome.runtime.sendMessage({ type: 'initPopup' });
+    });
   },
   computed: {
     defaultText() {
@@ -40,21 +52,6 @@ export default {
     };
   },
   methods: {
-    initialize() {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        const url = new URL(tabs[0].url);
-        const domain = url.hostname;
-        getStickiesFromStorage(domain).then((data) => {
-          console.log('before', {
-            data,
-            lco: window.location.hostname,
-            tab: tabs[0],
-          });
-          this.hasStickies = data?.stickies?.length;
-        });
-        chrome.tabs.sendMessage(tabs[0].id, { type: 'initPopup' });
-      });
-    },
     // TODO: now anther method - bring all notes to top
     // TODO: now anther method - donate link
     // Indicator for notes offscreen?

@@ -25,9 +25,7 @@ module.exports = {
         },
         contentScripts: {
           entries: {
-            'content-script': [
-              'src/content-scripts/content-script.js',
-            ],
+            'content-script': ['src/content-scripts/index.js'],
           },
         },
       },
