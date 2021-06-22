@@ -6,7 +6,6 @@ const id = 'simpleStickiesChromeAppWrapper';
 const hasEl = document.getElementById(id);
 
 if (!hasEl) {
-  console.log('initing');
   const elem = document.createElement('div');
   elem.id = id;
   document.body.appendChild(elem);

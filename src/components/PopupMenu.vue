@@ -31,11 +31,6 @@ export default {
       const url = new URL(tabs[0].url);
       const domain = url.hostname;
       getStickiesFromStorage(domain).then((data) => {
-        console.log('before', {
-          data,
-          lco: window.location.hostname,
-          tab: tabs[0],
-        });
         this.hasStickies = data?.stickies?.length;
       });
       chrome.runtime.sendMessage({ type: 'initPopup' });

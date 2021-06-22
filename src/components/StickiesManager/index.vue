@@ -22,7 +22,6 @@ export default {
   beforeCreate() {
     // setup listeners
     chrome.runtime.onMessage.addListener(async (request) => {
-      console.log('msg');
       if (request.type === 'toggleStickies') {
         const stickyData = await getStickiesFromStorage();
 
@@ -42,7 +41,6 @@ export default {
       }
       if (request.type === 'newSticky') {
         const stickyData = await addNewSticky();
-        console.log('newSticky', { stickyData: JSON.stringify(stickyData) });
         this.initialStickies = stickyData;
         this.showStickies = true;
       }

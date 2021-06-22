@@ -101,10 +101,8 @@ export default {
       // Don't trigger draggable when items in container are clicked / mousedown
       event.stopImmediatePropagation();
       event.stopPropagation();
-      console.log('blocker');
     },
     onMessageChange(event) {
-      console.log('onMessageChange');
       this.message = event.target.value;
       this.syncStorage();
     },
@@ -181,7 +179,7 @@ $border-rad: 3px;
   border-bottom-right-radius: $border-rad;
   resize: none;
   color: black;
-  font-size: 1rem;
+  font-size: 16px;
   margin: 0;
   &:focus {
     outline: none;
