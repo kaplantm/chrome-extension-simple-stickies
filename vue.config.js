@@ -1,4 +1,5 @@
 module.exports = {
+  filenameHashing: false, // https://github.com/adambullmer/vue-cli-plugin-browser-extension/issues/87#issuecomment-665663558
   pages: {
     popup: {
       template: 'public/browser-extension.html',
@@ -19,6 +20,12 @@ module.exports = {
   },
   pluginOptions: {
     browserExtension: {
+      manifestTransformer: (manifest) => {
+        if (process.env.NODE_ENV === 'development') {
+          manifest.content_scripts[1].css.pop();
+        }
+        return manifest;
+      },
       componentOptions: {
         background: {
           entry: 'src/background.js',

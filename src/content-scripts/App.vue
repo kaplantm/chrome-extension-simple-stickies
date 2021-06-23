@@ -13,14 +13,13 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style>
 #simpleStickiesChromeAppWrapper {
+  /* border: 30px solid red; */
   z-index: 10000000;
   position: absolute;
   top: 0;
   left: 0;
-  height: 0;
-  width: 0;
 }
 * {
   box-sizing: border-box;
