@@ -22,6 +22,7 @@
 
 <script>
 import { getStickiesFromStorage } from '../content-scripts/lib/storageUtils';
+import { hasMatchingPath } from './StickiesManager/helpers';
 
 export default {
   name: 'PopupMenu',
@@ -30,9 +31,18 @@ export default {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const url = new URL(tabs[0].url);
       const domain = url.hostname;
+
+      /* eslint-disable */
       getStickiesFromStorage(domain).then((data) => {
-        this.hasStickies = data?.stickies?.length;
+        const stickies = data?.stickies;
+        this.hasStickies = stickies?.length
+          ? !!stickies.filter((el) =>
+              hasMatchingPath(el.pathname, url.pathname)
+            ).length
+          : false;
       });
+      /* eslint-enable */
+
       chrome.runtime.sendMessage({ type: 'initPopup' });
     });
   },

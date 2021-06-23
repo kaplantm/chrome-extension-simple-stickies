@@ -40,6 +40,8 @@ export default {
   components: { VueDraggableResizable },
   props: {
     // TODO: now custom fonts?
+    pathname: String,
+    href: String,
     id: Number,
     initialX: Number,
     initialY: Number,
@@ -109,6 +111,8 @@ export default {
     // eslint-disable-next-line prefer-arrow-callback
     syncStorage: debounce(function doDebounce() {
       updateStoredStickyNote({
+        pathname: this.pathname,
+        href: this.pathname,
         id: this.id,
         initialX: this.x,
         initialY: this.y,
@@ -184,5 +188,9 @@ $border-rad: 3px;
   &:focus {
     outline: none;
   }
+}
+* {
+  box-sizing: border-box;
+  font-family: sans-serif;
 }
 </style>

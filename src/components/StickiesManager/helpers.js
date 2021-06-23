@@ -22,13 +22,13 @@ import {
 
 const getDefaultStickySite = (stickies = []) => ({
   hostname: window.location.hostname,
-  pathname: window.location.pathname,
-  href: window.location.href,
   id: new Date().getTime(),
   stickies,
 });
 
 const defaultSticky = {
+  pathname: window.location.pathname,
+  href: window.location.href,
   id: new Date().getTime(),
   initialX: 100,
   initialY: 100,
@@ -46,6 +46,7 @@ const getDefaultSticky = (partial = {}) => ({
 
 export function getNewSticky(count) {
   const scroll = document.documentElement.scrollTop || document.body.scrollTop;
+
   const partial = {
     initialX: defaultSticky.initialX + 20 * Math.floor(count + 1 / 10),
     initialY: defaultSticky.initialY + 25 * count + scroll,
@@ -56,7 +57,7 @@ export function getNewSticky(count) {
 export async function addNewSticky() {
   let stickySite = await getItemInStorage();
   if (!stickySite?.id) {
-    stickySite = getDefaultStickySite([getDefaultSticky()]);
+    stickySite = getDefaultStickySite([getNewSticky(0)]);
   } else {
     stickySite = {
       ...stickySite,
@@ -69,3 +70,8 @@ export async function addNewSticky() {
   await setItemInStorage(null, stickySite);
   return stickySite;
 }
+
+export const hasMatchingPath = (pathname, currentPathOverride) => {
+  const currentPath = currentPathOverride || window.location.pathname;
+  return currentPath === pathname;
+};

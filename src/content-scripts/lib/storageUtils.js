@@ -1,4 +1,5 @@
 // https://stackoverflow.com/questions/11922964/how-do-i-view-the-storage-of-a-chrome-extension-ive-installed
+// Enter these in background page console
 // chrome.storage.local.get(console.log)
 // chrome.storage.local.clear()
 

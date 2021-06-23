@@ -10,7 +10,7 @@
 
 <script>
 import Sticky from '@/components/Sticky/index.vue';
-import { addNewSticky } from './helpers';
+import { addNewSticky, hasMatchingPath } from './helpers';
 import {
   getStickiesFromStorage,
   setItemInStorage,
@@ -30,7 +30,7 @@ export default {
           const filteredStickyData = {
             ...stickyData,
             // clear empty notes when we hide them
-            stickies: safeStickies.filter((sticky) => sticky?.initialText),
+            stickies: safeStickies.filter((el) => el?.initialText),
           };
           await setItemInStorage(null, filteredStickyData);
           this.initialStickies = filteredStickyData;
@@ -41,7 +41,14 @@ export default {
       }
       if (request.type === 'newSticky') {
         const stickyData = await addNewSticky();
-        this.initialStickies = stickyData;
+        /* eslint-disable */
+        this.initialStickies = {
+          ...stickyData,
+          stickies: stickyData.stickies.filter((el) =>
+            hasMatchingPath(el?.pathname)
+          ),
+        };
+        /* eslint-enable */
         this.showStickies = true;
       }
     });
@@ -69,5 +76,9 @@ export default {
   left: 0;
   height: 0;
   width: 0;
+}
+* {
+  box-sizing: border-box;
+  font-family: sans-serif;
 }
 </style>

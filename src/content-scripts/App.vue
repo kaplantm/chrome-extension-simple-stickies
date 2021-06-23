@@ -20,9 +20,7 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-}
-* {
-  box-sizing: border-box;
-  font-family: sans-serif;
+  width: 0;
+  height: 0;
 }
 </style>
