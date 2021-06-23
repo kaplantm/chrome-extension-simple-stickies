@@ -20,12 +20,6 @@ module.exports = {
   },
   pluginOptions: {
     browserExtension: {
-      manifestTransformer: (manifest) => {
-        if (process.env.NODE_ENV === 'development') {
-          manifest.content_scripts[1].css.pop();
-        }
-        return manifest;
-      },
       componentOptions: {
         background: {
           entry: 'src/background.js',
