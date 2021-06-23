@@ -30,10 +30,8 @@ export default {
     // get initial stickies asynchronously
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const url = new URL(tabs[0].url);
-      const domain = url.hostname;
-
       /* eslint-disable */
-      getStickiesFromStorage(domain).then((data) => {
+      getStickiesFromStorage(url.hostname).then((data) => {
         const stickies = data?.stickies;
         this.hasStickies = stickies?.length
           ? !!stickies.filter((el) =>
@@ -64,13 +62,19 @@ export default {
       // TODO: only show if has stickies for page
       // https://stackoverflow.com/questions/45179138/sending-message-from-popup-to-content-script-chrome-extension
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, { type: 'toggleStickies' });
+        chrome.tabs.sendMessage(tabs[0].id, {
+          type: 'toggleStickies',
+          url: tabs[0].url,
+        });
       });
       window.close();
     },
     newSticky: () => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, { type: 'newSticky' });
+        chrome.tabs.sendMessage(tabs[0].id, {
+          type: 'newSticky',
+          url: tabs[0].url,
+        });
       });
       window.close();
     },

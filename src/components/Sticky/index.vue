@@ -91,7 +91,7 @@ export default {
     async onDelete(event) {
       this.blocker(event);
       // eslint-disable-next-line no-alert
-      if (window.confirm('Delete this note?') === true) {
+      if (!this.message || window.confirm('Delete this note?') === true) {
         await removeStoredStickyNote(this.id);
         chrome.runtime.sendMessage({
           type: 'deleteSticky',

@@ -44,26 +44,30 @@ const getDefaultSticky = (partial = {}) => ({
   ...partial,
 });
 
-export function getNewSticky(count) {
+export function getNewSticky(count, pathname, href) {
   const scroll = document.documentElement.scrollTop || document.body.scrollTop;
 
   const partial = {
     initialX: defaultSticky.initialX + 20 * Math.floor(count + 1 / 10),
     initialY: defaultSticky.initialY + 25 * count + scroll,
+    pathname,
+    href,
   };
   return getDefaultSticky(partial);
 }
 
-export async function addNewSticky() {
-  let stickySite = await getItemInStorage();
+export async function addNewSticky(url) {
+  let stickySite = await getItemInStorage(url.domain);
   if (!stickySite?.id) {
-    stickySite = getDefaultStickySite([getNewSticky(0)]);
+    stickySite = getDefaultStickySite([
+      getNewSticky(0, url.pathname, url.href),
+    ]);
   } else {
     stickySite = {
       ...stickySite,
       stickies: [
         ...stickySite.stickies,
-        getNewSticky(stickySite.stickies.length),
+        getNewSticky(stickySite.stickies.length, url.pathname, url.href),
       ],
     };
   }

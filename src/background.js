@@ -1,4 +1,4 @@
-browser.runtime.onMessage.addListener((request) => {
+browser.runtime.onMessage.addListener((request, sender) => {
   if (request) {
     if (request.type === 'initPopup') {
       if (process.env.NODE_ENV !== 'development') {
@@ -16,4 +16,16 @@ browser.runtime.onMessage.addListener((request) => {
       });
     }
   }
+});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      type:
+        changeInfo.status === 'complete'
+          ? 'pageLoadingComplete'
+          : 'pageLoading',
+      url: tabs[0] ? tabs[0].url : null,
+    });
+  });
 });
