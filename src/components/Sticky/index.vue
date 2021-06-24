@@ -16,6 +16,9 @@
     >
       <div class="header">
         <button class="delete" v-on:click="onDelete" v-on:mousedown="blocker" />
+        <button class="settings" v-on:click="onDelete" v-on:mousedown="blocker">
+          <img :src="settingsImg" alt="settings" width="100%" />
+        </button>
       </div>
       <textarea
         :value="message"
@@ -51,6 +54,7 @@ export default {
     initialBgColor: String,
   },
   data() {
+    console.log({ exturl: chrome.runtime.getURL('assets/settings.svg') });
     return {
       width: this.initialWidth,
       height: this.initialHeight,
@@ -58,6 +62,7 @@ export default {
       y: this.initialY,
       message: this.initialText || '',
       deleted: false,
+      settingsImg: chrome.runtime.getURL('assets/settings.svg'),
     };
   },
   computed: {
@@ -157,16 +162,25 @@ $border-rad: 3px;
   padding-left: 0.25rem;
   padding-right: 0.25rem;
   background-color: hsla(0, 0%, 0%, 0.075);
+  & button {
+    cursor: pointer;
+    width: 12px;
+    height: 12px;
+    margin: 2px;
+    border-radius: 6px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+.settings {
+  background-color: transparent;
+  border: none;
 }
 .delete {
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  margin: 2px;
-  border-radius: 6px;
   background-color: hsla(0, 50%, 60%, 1);
   border: 1px solid hsla(0, 50%, 50%, 1);
-  padding: 0;
   &:hover {
     background-color: hsla(0, 70%, 50%, 1);
   }

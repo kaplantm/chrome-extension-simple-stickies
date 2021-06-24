@@ -30,14 +30,19 @@ export default {
     // get initial stickies asynchronously
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const url = new URL(tabs[0].url);
+
       /* eslint-disable */
       getStickiesFromStorage(url.hostname).then((data) => {
         const stickies = data?.stickies;
-        this.hasStickies = stickies?.length
-          ? !!stickies.filter((el) =>
-              hasMatchingPath(el.pathname, url.pathname)
+        const hasStickies = stickies?.length
+          ? !!stickies.filter(
+              (el) =>
+                el.initialText && hasMatchingPath(el.pathname, url.pathname)
             ).length
           : false;
+        this.hasStickies = hasStickies;
+
+        console.log('getStickiesFromStorage', { stickies, hasStickies });
       });
       /* eslint-enable */
 

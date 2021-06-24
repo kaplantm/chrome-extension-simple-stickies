@@ -66,7 +66,7 @@ export async function addNewSticky(url) {
     stickySite = {
       ...stickySite,
       stickies: [
-        ...stickySite.stickies,
+        ...stickySite.stickies.filter((el) => el.initialText),
         getNewSticky(stickySite.stickies.length, url.pathname, url.href),
       ],
     };
