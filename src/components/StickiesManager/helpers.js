@@ -46,7 +46,7 @@ const getDefaultSticky = (partial = {}) => ({
 
 export function getNewSticky(count, pathname, href) {
   const scroll = document.documentElement.scrollTop || document.body.scrollTop;
-
+  console.log('getNewSticky', { pathname, href });
   const partial = {
     initialX: defaultSticky.initialX + 20 * Math.floor(count + 1 / 10),
     initialY: defaultSticky.initialY + 25 * count + scroll,
@@ -75,7 +75,19 @@ export async function addNewSticky(url) {
   return stickySite;
 }
 
-export const hasMatchingPath = (pathname, currentPathOverride) => {
+export const matchesPageSpecificity = (
+  sticky,
+  currentPathOverride,
+  currentHrefOverride
+) => {
   const currentPath = currentPathOverride || window.location.pathname;
-  return currentPath === pathname;
+  const currentHref = currentHrefOverride || window.location.href;
+  console.log('matchesPageSpecificity', {
+    sticky,
+    currentPathOverride,
+    currentHrefOverride,
+  });
+  return sticky.initialUseHrefSpecificity
+    ? sticky.href === currentHref
+    : sticky.pathname === currentPath;
 };

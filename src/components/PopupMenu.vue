@@ -22,7 +22,7 @@
 
 <script>
 import { getStickiesFromStorage } from '../content-scripts/lib/storageUtils';
-import { hasMatchingPath } from './StickiesManager/helpers';
+import { matchesPageSpecificity } from './StickiesManager/helpers';
 
 export default {
   name: 'PopupMenu',
@@ -32,12 +32,11 @@ export default {
       const url = new URL(tabs[0].url);
 
       /* eslint-disable */
-      getStickiesFromStorage(url.hostname).then((data) => {
+      getStickiesFromStorage(url.hostname, true).then((data) => {
         const stickies = data?.stickies;
         const hasStickies = stickies?.length
-          ? !!stickies.filter(
-              (el) =>
-                el.initialText && hasMatchingPath(el.pathname, url.pathname)
+          ? !!stickies.filter((el) =>
+              matchesPageSpecificity(el, url.pathname, url.href)
             ).length
           : false;
         this.hasStickies = hasStickies;

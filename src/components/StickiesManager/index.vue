@@ -1,8 +1,9 @@
 <template>
-  <div class="stickyManagerTestWrapper">
+  <div class="stickyManagerOuterWrapper">
+    <!-- <h1>{{ showStickies }}</h1> -->
     <div class="stickyManagerWrapper" v-if="showStickies">
       <div v-for="item in initialStickies.stickies" :key="item.id">
-        <Sticky v-bind="item" />
+        <Sticky v-bind="item" :hostname="hostname" />
       </div>
     </div>
   </div>
@@ -10,7 +11,7 @@
 
 <script>
 import Sticky from '@/components/Sticky/index.vue';
-import { addNewSticky, hasMatchingPath } from './helpers';
+import { addNewSticky, matchesPageSpecificity } from './helpers';
 import {
   getStickiesFromStorage,
   setItemInStorage,
@@ -35,11 +36,13 @@ export default {
           if (this.initOn !== url.href) {
             console.log('doing init on complete', url.href);
             this.initOn = url.href;
+            this.hostname = url.hostname;
             this.initialize();
           }
         }
         if (request.type === 'toggleStickies') {
-          const stickyData = await getStickiesFromStorage(url.hostname);
+          // if notes are visible: get only non-empty notes for current page
+          const stickyData = await getStickiesFromStorage(url.hostname, true);
 
           const safeStickies = stickyData?.stickies || [];
           /* eslint-disable */
@@ -47,10 +50,8 @@ export default {
             ...stickyData,
             // if notes are visible: get only non-empty notes for current pagec
             // else: get only non-empty notes and update storage to remove empty ones
-            stickies: safeStickies.filter(
-              (el) =>
-                el?.pathname === url.pathname &&
-                (this.showStickies || el?.initialText)
+            stickies: safeStickies.filter((el) =>
+              matchesPageSpecificity(el, url.pathname, url.href)
             ),
           };
           /* eslint-enable */
@@ -67,7 +68,7 @@ export default {
           this.initialStickies = {
             ...stickyData,
             stickies: stickyData.stickies.filter((el) =>
-              hasMatchingPath(el?.pathname, url.pathname)
+              matchesPageSpecificity(el, url.pathname, url.href)
             ),
           };
           /* eslint-enable */
@@ -79,7 +80,7 @@ export default {
     initialize() {
       this.showStickies = false;
       // get initial stickies asynchronously
-      getStickiesFromStorage().then((data) => {
+      getStickiesFromStorage(this.hostname, true).then((data) => {
         this.initialStickies = data;
       });
     },
@@ -89,13 +90,14 @@ export default {
       initialStickies: { stickies: [] },
       showStickies: false,
       initOn: null,
+      hostname: null,
     };
   },
 };
 </script>
 
 <style scoped>
-.stickyManagerTestWrapper {
+.stickyManagerOuterWrapper {
   z-index: 100000;
 }
 .stickyManagerWrapper {

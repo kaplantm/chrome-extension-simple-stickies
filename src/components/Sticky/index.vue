@@ -14,9 +14,26 @@
       @dragging="onDrag"
       @resizing="onResize"
     >
+      <div v-bind:class="[{ active: showSettings }, 'settingsWrapper']">
+        <div v-if="showSettings">
+          <SettingsPanel
+            :syncStorage="syncStorage"
+            :hostname="hostname"
+            :pathname="pathname"
+            :href="href"
+            :initialBgColor="bgColor"
+            :initialUseHrefSpecificity="useHrefSpecificity"
+          />
+        </div>
+      </div>
       <div class="header">
         <button class="delete" v-on:click="onDelete" v-on:mousedown="blocker" />
-        <button class="settings" v-on:click="onDelete" v-on:mousedown="blocker">
+        <button
+          v-if="hasPageSpecificitySettings"
+          class="settings"
+          v-on:click="onSettingsClick"
+          v-on:mousedown="blocker"
+        >
           <img :src="settingsImg" alt="settings" width="100%" />
         </button>
       </div>
@@ -31,17 +48,19 @@
   </div>
 </template>
 
+<!-- TODO: sticky manager use page specificyty -->
 <script>
-import VueDraggableResizable from 'vue-draggable-resizable';
-
 import 'vue-draggable-resizable/dist/VueDraggableResizable.css';
 import debounce from 'lodash/debounce';
+import VueDraggableResizable from 'vue-draggable-resizable';
+import SettingsPanel from './SettingsPanel/index.vue';
 import { updateStoredStickyNote, removeStoredStickyNote } from './helpers';
 
 export default {
   name: 'Sticky',
-  components: { VueDraggableResizable },
+  components: { VueDraggableResizable, SettingsPanel },
   props: {
+    hostname: String,
     // TODO: now custom fonts?
     pathname: String,
     href: String,
@@ -52,9 +71,10 @@ export default {
     initialWidth: Number,
     initialText: String,
     initialBgColor: String,
+    initialUseHrefSpecificity: Boolean,
   },
   data() {
-    console.log({ exturl: chrome.runtime.getURL('assets/settings.svg') });
+    console.log({ href: this.href, path: this.pathname });
     return {
       width: this.initialWidth,
       height: this.initialHeight,
@@ -63,6 +83,7 @@ export default {
       message: this.initialText || '',
       deleted: false,
       settingsImg: chrome.runtime.getURL('assets/settings.svg'),
+      showSettings: false,
     };
   },
   computed: {
@@ -97,12 +118,15 @@ export default {
       this.blocker(event);
       // eslint-disable-next-line no-alert
       if (!this.message || window.confirm('Delete this note?') === true) {
-        await removeStoredStickyNote(this.id);
+        await removeStoredStickyNote(this.id, this.hostname);
         chrome.runtime.sendMessage({
           type: 'deleteSticky',
         });
         this.deleted = true;
       }
+    },
+    onSettingsClick() {
+      this.showSettings = !this.showSettings;
     },
     blocker(event) {
       // Don't trigger draggable when items in container are clicked / mousedown
@@ -113,20 +137,28 @@ export default {
       this.message = event.target.value;
       this.syncStorage();
     },
+    onPageSpecificityChangeWrapper(event) {
+      this.useHrefSpecificity = event.target.value === 'true';
+      this.syncStorage();
+    },
     // eslint-disable-next-line prefer-arrow-callback
     syncStorage: debounce(function doDebounce() {
-      updateStoredStickyNote({
-        pathname: this.pathname,
-        href: this.pathname,
-        id: this.id,
-        initialX: this.x,
-        initialY: this.y,
-        initialHeight: this.height,
-        initialWidth: this.width,
-        initialText: this.message,
-        initialBgColor: this.initialBgColor,
-      });
-    }, 3000),
+      updateStoredStickyNote(
+        {
+          pathname: this.pathname,
+          href: this.href,
+          id: this.id,
+          initialX: this.x,
+          initialY: this.y,
+          initialHeight: this.height,
+          initialWidth: this.width,
+          initialText: this.message,
+          initialBgColor: this.initialBgColor,
+          initialUseHrefSpecificity: this.useHrefSpecificity,
+        },
+        this.hostname
+      );
+    }, 1000),
   },
 };
 </script>
@@ -203,6 +235,80 @@ $border-rad: 3px;
     outline: none;
   }
 }
+.settingsWrapper {
+  background-color: hsla(0, 0%, 90%, 1);
+  border: 2px solid hsla(0, 0%, 0%, 0.1);
+  border-radius: $border-rad;
+  position: absolute;
+  top: 0;
+  bottom: -0.5em;
+  left: 0;
+  opacity: 0;
+  max-width: 0;
+  padding: 1em;
+  transform: translateY(100%);
+  max-width: 500px;
+  overflow: 'scroll'; // -webkit-transition: transform 200ms linear;
+  // -ms-transition: transform 200ms linear;
+  // transition: transform 200ms linear;
+  // -webkit-transition: opacity, max-width 300ms linear;
+  // -ms-transition: opacity, max-width 300ms linear;
+  // transition: opacity, max-width 300ms linear;
+  &.active {
+    max-width: unset;
+    opacity: 1;
+    animation: fadeIn 0.5s;
+    -webkit-animation: fadeIn 0.5s;
+    -moz-animation: fadeIn 0.5s;
+    -o-animation: fadeIn 0.5s;
+    -ms-animation: fadeIn 0.5s;
+  }
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-o-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-ms-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 * {
   box-sizing: border-box;
   font-family: sans-serif;

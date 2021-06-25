@@ -23,7 +23,14 @@ export async function setItemInStorage(key, value) {
   });
 }
 
-export async function getStickiesFromStorage(key) {
+export async function getStickiesFromStorage(key, omitEmpty) {
   const data = (await getItemInStorage(key)) || {};
+  const safeStickies = data.stickies || [];
+  if (omitEmpty) {
+    return {
+      ...data,
+      stickies: safeStickies.filter((el) => el?.initialText),
+    };
+  }
   return data;
 }

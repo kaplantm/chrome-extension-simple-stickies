@@ -4,8 +4,8 @@ import {
   setItemInStorage,
 } from '../../content-scripts/lib/storageUtils';
 
-export async function updateStoredStickyNote(sticky) {
-  const stickyData = await getStickiesFromStorage();
+export async function updateStoredStickyNote(sticky, key) {
+  const stickyData = await getStickiesFromStorage(key);
   if (!stickyData) {
     return false; // TODO: error handling
   }
@@ -19,8 +19,8 @@ export async function updateStoredStickyNote(sticky) {
   return true;
 }
 
-export async function removeStoredStickyNote(id) {
-  const stickyData = await getStickiesFromStorage();
+export async function removeStoredStickyNote(id, key) {
+  const stickyData = await getStickiesFromStorage(key);
   const safeStickies = stickyData.stickies || [];
   const stickiesClone = safeStickies.filter((val) => val.id !== id);
   await setItemInStorage(null, { ...stickyData, stickies: stickiesClone });
