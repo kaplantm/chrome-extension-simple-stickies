@@ -3,6 +3,7 @@ import {
   getItemInStorage,
   setItemInStorage,
 } from '../../content-scripts/lib/storageUtils';
+import { colors } from '../../content-scripts/lib/colors';
 
 // const exampleStickyData = {
 //   'https://www.google.com/': {
@@ -35,7 +36,8 @@ const defaultSticky = {
   initialHeight: 100,
   initialWidth: 300,
   initialText: '',
-  initialBgColor: 'hsla(50, 100%, 70%, 1)',
+  initialBgColor: colors.yellow,
+  initialIgnoreQueryParams: false,
 };
 
 const getDefaultSticky = (partial = {}) => ({
@@ -87,7 +89,7 @@ export const matchesPageSpecificity = (
     currentPathOverride,
     currentHrefOverride,
   });
-  return sticky.initialUseHrefSpecificity
+  return sticky.initialIgnoreQueryParams
     ? sticky.href === currentHref
     : sticky.pathname === currentPath;
 };
