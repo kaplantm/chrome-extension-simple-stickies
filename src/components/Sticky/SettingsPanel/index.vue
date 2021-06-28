@@ -1,18 +1,53 @@
 <template>
-  <div v-if="hasPageSpecificitySettings">
-    <span for="pageSpecificityCheckbox"
-      >Show only on pages with matching queries</span
-    >
-    <input
-      type="checkbox"
-      id="pageSpecificityCheckbox"
-      @input="onPageSpecificityChange"
-    />
+  <div>
+    <div class="v-padding color-options-container">
+      <span>Background:&nbsp;</span>
+      <div v-for="colorName in Object.keys(colorOptions)" :key="colorName">
+        <button
+          class="color-button"
+          :style="getBackgroundStyle(colorOptions[colorName])"
+          v-on:click="onBgColorChange(colorName)"
+        />
+      </div>
+    </div>
+    <details class="advancedSettings">
+      <summary class="v-padding">Advanced Settings</summary>
+
+      <div class="v-padding">
+        <input
+          type="checkbox"
+          id="pageSpecificityCheckbox"
+          :checked="ignoreQueryParams"
+          @input="onPageSpecificityChange"
+        />
+        <span for="pageSpecificityCheckbox"
+          >&nbsp;Ignore URL query parameters
+          <span class="params-info"
+            >Sticky will show on all pages with matching URL path</span
+          ><br />
+          <div class="params-flex">
+            <span class="params-info">URL:&nbsp;</span
+            ><span class="params">{{ href }}</span>
+          </div></span
+        >
+      </div>
+      <p v-if="willHide" class="v-padding warning">
+        This sticky will no longer be shown on this page.
+      </p>
+      <button
+        :disabled="initialIgnoreQueryParams === ignoreQueryParams"
+        v-on:click="onSavedAdvanced"
+      >
+        Save
+      </button>
+    </details>
   </div>
 </template>
 
 <!-- TODO: sticky manager use page specificyty -->
 <script>
+import { colors } from '../../../content-scripts/lib/colors';
+
 export default {
   name: 'SettingsPanel',
   props: {
@@ -21,181 +56,106 @@ export default {
     pathname: String,
     href: String,
     initialBgColor: String,
-    initialUseHrefSpecificity: Boolean,
-    onPageSpecificityChange: Function,
+    initialIgnoreQueryParams: Boolean,
+    updateNoteSettings: Function,
   },
   data() {
-    console.log({ href: this.href, path: this.pathname });
     return {
-      useHrefSpecificity: this.initialUseHrefSpecificity || false,
+      colorOptions: colors,
       hrefEnding: `/${this.href
         .split('/')
         .slice(3)
         .join('/')}`,
+      showAdvanced: false,
+      ignoreQueryParams: this.initialIgnoreQueryParams,
     };
   },
   computed: {
-    hasPageSpecificitySettings() {
-      console.log('hasPageSpecificitySettings', {
-        ending: this.hrefEnding,
-        path: this.pathname,
-      });
-      // figure out what to do about when setting this the sticky should disappear
-      // confirmation? This will hide this sticky on this page. It will still be visible on x.
-      return this.hrefEnding !== this.pathname;
+    willHide() {
+      return this.ignoreQueryParams && window.location.href !== this.href;
+    },
+  },
+  methods: {
+    onPageSpecificityChange(event) {
+      this.ignoreQueryParams = event.target.checked;
+    },
+    onSavedAdvanced() {
+      this.updateNoteSettings(this.ignoreQueryParams);
+    },
+    getBackgroundStyle(color) {
+      return {
+        'background-color': color || this.bgColor,
+      };
+    },
+    onBgColorChange(color) {
+      this.updateNoteSettings(undefined, color);
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
-$border-rad: 3px;
-
-.sticky {
-  -webkit-transition: opacity 200ms linear;
-  -ms-transition: opacity 200ms linear;
-  transition: opacity 200ms linear;
-  border: 2px solid hsla(200, 50%, 50%, 1);
-  z-index: 100000000 !important;
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0px 7px 10px 0px hsla(0, 0%, 0%, 0.2);
-  border-radius: $border-rad;
-  border: none;
+.advancedSettings {
+  background-color: hsla(0, 0%, 0%, 0.075);
+  border: 2px solid hsla(0, 0%, 0%, 0.1);
+  padding: 0.5em;
+  border-radius: 3px;
 }
-.dragging-sticky {
-  opacity: 0.65;
+.v-padding {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
-.header {
-  cursor: move;
-  border-top-left-radius: $border-rad;
-  border-top-right-radius: $border-rad;
-  border: 2px solid hsla(0, 0%, 0%, 0.05);
+.warning {
+  color: hsla(0, 50%, 50%, 1);
+}
+.params-info {
+  font-size: 0.8em;
+}
+.params-flex {
+  margin-top: 0.25em;
   display: flex;
   align-items: center;
-  width: 100%;
-  height: 20px;
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
-  background-color: hsla(0, 0%, 0%, 0.075);
-  & button {
-    cursor: pointer;
-    width: 12px;
-    height: 12px;
-    margin: 2px;
-    border-radius: 6px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 }
-.settings {
-  background-color: transparent;
-  border: none;
-}
-.delete {
-  background-color: hsla(0, 50%, 60%, 1);
-  border: 1px solid hsla(0, 50%, 50%, 1);
-  &:hover {
-    background-color: hsla(0, 70%, 50%, 1);
-  }
-}
-.stickyInput {
+.params {
   flex: 1;
-  min-height: 1rem;
-  min-width: 1rem;
+  // display: inline-block;
+  font-size: 0.8em;
+  padding: 0.25em;
+  width: 100%;
+  // max-height: 2em;
+  white-space: nowrap;
   border: 2px solid hsla(0, 0%, 0%, 0.1);
-  border-top: none;
-  padding: 0.5rem;
-  border-radius: 0;
-  border-bottom-left-radius: $border-rad;
-  border-bottom-right-radius: $border-rad;
-  resize: none;
-  color: black;
-  font-size: 16px;
-  margin: 0;
-  &:focus {
-    outline: none;
+  background: hsla(0, 0%, 0%, 0.05);
+  word-wrap: break-word;
+  overflow: scroll;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
-.settingsWrapper {
-  background-color: hsla(0, 0%, 90%, 1);
-  border: 2px solid hsla(0, 0%, 0%, 0.1);
-  border-radius: $border-rad;
-  position: absolute;
-  top: 0;
-  bottom: -0.5em;
-  left: 0;
-  opacity: 0;
-  max-width: 0;
-  padding: 1em;
-  transform: translateY(100%);
-  max-width: 500px;
-  overflow: 'scroll'; // -webkit-transition: transform 200ms linear;
-  // -ms-transition: transform 200ms linear;
-  // transition: transform 200ms linear;
-  // -webkit-transition: opacity, max-width 300ms linear;
-  // -ms-transition: opacity, max-width 300ms linear;
-  // transition: opacity, max-width 300ms linear;
-  &.active {
-    max-width: unset;
-    opacity: 1;
-    animation: fadeIn 0.5s;
-    -webkit-animation: fadeIn 0.5s;
-    -moz-animation: fadeIn 0.5s;
-    -o-animation: fadeIn 0.5s;
-    -ms-animation: fadeIn 0.5s;
-  }
+.color-button {
+  width: 1em;
+  height: 1em;
 }
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
+.color-options-container {
+  display: flex;
+  align-items: center;
+  & button {
+    margin: 0.25em;
   }
 }
 
-@-moz-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+button {
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2em;
+  width: 100%;
 }
-
-@-webkit-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-o-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-ms-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 * {
   box-sizing: border-box;
   font-family: sans-serif;
+  font-size: 1em;
 }
 </style>

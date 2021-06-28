@@ -40,8 +40,6 @@ export default {
             ).length
           : false;
         this.hasStickies = hasStickies;
-
-        console.log('getStickiesFromStorage', { stickies, hasStickies });
       });
       /* eslint-enable */
 

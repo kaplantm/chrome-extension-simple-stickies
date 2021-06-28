@@ -13,23 +13,24 @@
       :drag-handle="'.header'"
       @dragging="onDrag"
       @resizing="onResize"
+      :handles="['tl', 'tr', 'br', 'bl']"
+      :active.sync="sizingActive"
     >
       <div v-bind:class="[{ active: showSettings }, 'settingsWrapper']">
         <div v-if="showSettings">
           <SettingsPanel
-            :syncStorage="syncStorage"
+            :updateNoteSettings="updateNoteSettings"
             :hostname="hostname"
             :pathname="pathname"
             :href="href"
             :initialBgColor="bgColor"
-            :initialUseHrefSpecificity="useHrefSpecificity"
+            :initialIgnoreQueryParams="ignoreQueryParams"
           />
         </div>
       </div>
       <div class="header">
         <button class="delete" v-on:click="onDelete" v-on:mousedown="blocker" />
         <button
-          v-if="hasPageSpecificitySettings"
           class="settings"
           v-on:click="onSettingsClick"
           v-on:mousedown="blocker"
@@ -43,6 +44,7 @@
         placeholder="Add some notes"
         class="stickyInput"
         :style="stickyInputStyle"
+        v-on:click="disabledSizingActive"
       />
     </vue-draggable-resizable>
   </div>
@@ -55,6 +57,7 @@ import debounce from 'lodash/debounce';
 import VueDraggableResizable from 'vue-draggable-resizable';
 import SettingsPanel from './SettingsPanel/index.vue';
 import { updateStoredStickyNote, removeStoredStickyNote } from './helpers';
+import { colors } from '../../content-scripts/lib/colors';
 
 export default {
   name: 'Sticky',
@@ -71,10 +74,9 @@ export default {
     initialWidth: Number,
     initialText: String,
     initialBgColor: String,
-    initialUseHrefSpecificity: Boolean,
+    initialIgnoreQueryParams: Boolean,
   },
   data() {
-    console.log({ href: this.href, path: this.pathname });
     return {
       width: this.initialWidth,
       height: this.initialHeight,
@@ -82,21 +84,24 @@ export default {
       y: this.initialY,
       message: this.initialText || '',
       deleted: false,
+      bgColor: this.initialBgColor,
       settingsImg: chrome.runtime.getURL('assets/settings.svg'),
       showSettings: false,
+      ignoreQueryParams: this.initialIgnoreQueryParams || false,
+      sizingActive: false,
     };
   },
   computed: {
     stickyStyle() {
       return {
-        'background-color': this.initialBgColor,
+        'background-color': colors[this.bgColor] || colors.yellow,
         top: 0,
         left: 0,
       };
     },
     stickyInputStyle() {
       return {
-        'background-color': this.initialBgColor,
+        'background-color': colors[this.bgColor] || colors.yellow,
         width: '100%',
       };
     },
@@ -137,11 +142,15 @@ export default {
       this.message = event.target.value;
       this.syncStorage();
     },
-    onPageSpecificityChangeWrapper(event) {
-      this.useHrefSpecificity = event.target.value === 'true';
+    updateNoteSettings(newIgnoreQueryParams, newBgColor) {
+      this.ignoreQueryParams =
+        newIgnoreQueryParams !== undefined
+          ? newIgnoreQueryParams
+          : this.ignoreQueryParams;
+
+      this.bgColor = newBgColor !== undefined ? newBgColor : this.bgColor;
       this.syncStorage();
     },
-    // eslint-disable-next-line prefer-arrow-callback
     syncStorage: debounce(function doDebounce() {
       updateStoredStickyNote(
         {
@@ -153,12 +162,15 @@ export default {
           initialHeight: this.height,
           initialWidth: this.width,
           initialText: this.message,
-          initialBgColor: this.initialBgColor,
-          initialUseHrefSpecificity: this.useHrefSpecificity,
+          initialBgColor: this.bgColor,
+          initialIgnoreQueryParams: this.ignoreQueryParams,
         },
         this.hostname
       );
     }, 1000),
+    disabledSizingActive() {
+      this.sizingActive = false;
+    },
   },
 };
 </script>
@@ -240,22 +252,14 @@ $border-rad: 3px;
   border: 2px solid hsla(0, 0%, 0%, 0.1);
   border-radius: $border-rad;
   position: absolute;
-  top: 0;
   bottom: -0.5em;
   left: 0;
   opacity: 0;
-  max-width: 0;
-  padding: 1em;
+  padding: 0.5em;
   transform: translateY(100%);
-  max-width: 500px;
-  overflow: 'scroll'; // -webkit-transition: transform 200ms linear;
-  // -ms-transition: transform 200ms linear;
-  // transition: transform 200ms linear;
-  // -webkit-transition: opacity, max-width 300ms linear;
-  // -ms-transition: opacity, max-width 300ms linear;
-  // transition: opacity, max-width 300ms linear;
+  max-width: min(100%, 500px);
+  min-width: 400px;
   &.active {
-    max-width: unset;
     opacity: 1;
     animation: fadeIn 0.5s;
     -webkit-animation: fadeIn 0.5s;

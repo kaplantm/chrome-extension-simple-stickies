@@ -3,6 +3,7 @@ import {
   getItemInStorage,
   setItemInStorage,
 } from '../../content-scripts/lib/storageUtils';
+import { colors } from '../../content-scripts/lib/colors';
 
 // const exampleStickyData = {
 //   'https://www.google.com/': {
@@ -35,7 +36,8 @@ const defaultSticky = {
   initialHeight: 100,
   initialWidth: 300,
   initialText: '',
-  initialBgColor: 'hsla(50, 100%, 70%, 1)',
+  initialBgColor: colors.yellow,
+  initialIgnoreQueryParams: false,
 };
 
 const getDefaultSticky = (partial = {}) => ({
@@ -46,7 +48,6 @@ const getDefaultSticky = (partial = {}) => ({
 
 export function getNewSticky(count, pathname, href) {
   const scroll = document.documentElement.scrollTop || document.body.scrollTop;
-  console.log('getNewSticky', { pathname, href });
   const partial = {
     initialX: defaultSticky.initialX + 20 * Math.floor(count + 1 / 10),
     initialY: defaultSticky.initialY + 25 * count + scroll,
@@ -82,12 +83,8 @@ export const matchesPageSpecificity = (
 ) => {
   const currentPath = currentPathOverride || window.location.pathname;
   const currentHref = currentHrefOverride || window.location.href;
-  console.log('matchesPageSpecificity', {
-    sticky,
-    currentPathOverride,
-    currentHrefOverride,
-  });
-  return sticky.initialUseHrefSpecificity
-    ? sticky.href === currentHref
-    : sticky.pathname === currentPath;
+
+  return sticky.initialIgnoreQueryParams
+    ? sticky.pathname === currentPath
+    : sticky.href === currentHref;
 };

@@ -32,9 +32,7 @@ export default {
         // this.showStickies = false;
         // }
         if (request.type === 'pageLoadingComplete') {
-          console.log('do init on complete?');
           if (this.initOn !== url.href) {
-            console.log('doing init on complete', url.href);
             this.initOn = url.href;
             this.hostname = url.hostname;
             this.initialize();
@@ -62,7 +60,6 @@ export default {
           this.showStickies = !this.showStickies;
         }
         if (request.type === 'newSticky') {
-          console.log('newSticky', url);
           const stickyData = await addNewSticky(url);
           /* eslint-disable */
           this.initialStickies = {
@@ -106,6 +103,7 @@ export default {
   left: 0;
   height: 0;
   width: 0;
+  font-size: 16px;
 }
 * {
   box-sizing: border-box;
