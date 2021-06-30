@@ -1,5 +1,7 @@
 <template>
   <div>
+    {{ initialFontSize }}<br />
+    {{ initialFontStyle }}
     <div class="v-padding color-options-container">
       <span>Background:&nbsp;</span>
       <div v-for="colorName in Object.keys(colorOptions)" :key="colorName">
@@ -8,6 +10,30 @@
           :style="getBackgroundStyle(colorOptions[colorName])"
           v-on:click="onBgColorChange(colorName)"
         />
+      </div>
+    </div>
+    <div class="v-padding color-options-container">
+      <span>Font Size:&nbsp;</span>
+      <div v-for="size in fontSizes" :key="size">
+        <button
+          class="font-button"
+          :style="getFontSizeStyle(size)"
+          v-on:click="onFontSizeChange(size)"
+        >
+          A
+        </button>
+      </div>
+    </div>
+    <div class="v-padding color-options-container">
+      <span>Font Style:&nbsp;</span>
+      <div v-for="style in fontStyles" :key="style">
+        <button
+          class="font-button"
+          :style="getFontStyleStyle(style)"
+          v-on:click="onFontStyleChange(style)"
+        >
+          A
+        </button>
       </div>
     </div>
     <details class="advancedSettings">
@@ -47,6 +73,7 @@
 <!-- TODO: sticky manager use page specificyty -->
 <script>
 import { colors } from '../../../content-scripts/lib/colors';
+import { fontStyles, fontSizes } from '../../../content-scripts/lib/fonts';
 
 export default {
   name: 'SettingsPanel',
@@ -58,9 +85,13 @@ export default {
     initialBgColor: String,
     initialIgnoreQueryParams: Boolean,
     updateNoteSettings: Function,
+    initialFontSize: Number,
+    initialFontStyle: String,
   },
   data() {
     return {
+      fontStyles,
+      fontSizes,
       colorOptions: colors,
       hrefEnding: `/${this.href
         .split('/')
@@ -87,8 +118,26 @@ export default {
         'background-color': color || this.bgColor,
       };
     },
+    getFontSizeStyle(size) {
+      return {
+        'font-size': `${size || this.fontSize}em`,
+      };
+    },
+    getFontStyleStyle(style) {
+      return {
+        'font-family': style || this.fontStyle,
+      };
+    },
     onBgColorChange(color) {
       this.updateNoteSettings(undefined, color);
+    },
+
+    onFontSizeChange(size) {
+      console.log('onFontSizeChange', size);
+      this.updateNoteSettings(undefined, undefined, size);
+    },
+    onFontStyleChange(style) {
+      this.updateNoteSettings(undefined, undefined, undefined, style);
     },
   },
 };
@@ -135,6 +184,10 @@ export default {
 .color-button {
   width: 1em;
   height: 1em;
+}
+.font-button {
+  background-color: transparent;
+  border: none;
 }
 .color-options-container {
   display: flex;

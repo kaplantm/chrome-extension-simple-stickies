@@ -24,6 +24,8 @@
             :pathname="pathname"
             :href="href"
             :initialBgColor="bgColor"
+            :initialFontSize="fontSize"
+            :initialFontStyle="fontStyle"
             :initialIgnoreQueryParams="ignoreQueryParams"
           />
         </div>
@@ -75,6 +77,8 @@ export default {
     initialText: String,
     initialBgColor: String,
     initialIgnoreQueryParams: Boolean,
+    initialFontSize: Number,
+    initialFontStyle: Boolean,
   },
   data() {
     return {
@@ -89,6 +93,8 @@ export default {
       showSettings: false,
       ignoreQueryParams: this.initialIgnoreQueryParams || false,
       sizingActive: false,
+      fontSize: this.initialFontSize,
+      fontStyle: this.initialFontStyle,
     };
   },
   computed: {
@@ -103,6 +109,8 @@ export default {
       return {
         'background-color': colors[this.bgColor] || colors.yellow,
         width: '100%',
+        'font-size': this.fontSize ? `${this.fontSize}em` : 'inherit',
+        'font-family': this.fontStyle || 'inherit',
       };
     },
   },
@@ -142,13 +150,21 @@ export default {
       this.message = event.target.value;
       this.syncStorage();
     },
-    updateNoteSettings(newIgnoreQueryParams, newBgColor) {
+    updateNoteSettings(
+      newIgnoreQueryParams,
+      newBgColor,
+      newFontSize,
+      newFontStyle
+    ) {
       this.ignoreQueryParams =
         newIgnoreQueryParams !== undefined
           ? newIgnoreQueryParams
           : this.ignoreQueryParams;
 
       this.bgColor = newBgColor !== undefined ? newBgColor : this.bgColor;
+      this.fontSize = newFontSize !== undefined ? newFontSize : this.fontSize;
+      this.fontStyle =
+        newFontStyle !== undefined ? newFontStyle : this.fontStyle;
       this.syncStorage();
     },
     syncStorage: debounce(function doDebounce() {
@@ -164,6 +180,8 @@ export default {
           initialText: this.message,
           initialBgColor: this.bgColor,
           initialIgnoreQueryParams: this.ignoreQueryParams,
+          initialFontSize: this.fontSize,
+          initialFontStyle: this.fontStyle,
         },
         this.hostname
       );

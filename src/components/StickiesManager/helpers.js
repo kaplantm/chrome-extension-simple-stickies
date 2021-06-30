@@ -38,6 +38,9 @@ const defaultSticky = {
   initialText: '',
   initialBgColor: colors.yellow,
   initialIgnoreQueryParams: false,
+  // these start out undefined so they inherit parent's style
+  // fontStyle: 'sans-serif',
+  // fontSize: 1,
 };
 
 const getDefaultSticky = (partial = {}) => ({
