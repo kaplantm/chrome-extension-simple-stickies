@@ -2,8 +2,9 @@
 import {
   getItemInStorage,
   setItemInStorage,
+  getDefaultSticky,
+  defaultSticky,
 } from '../../content-scripts/lib/storageUtils';
-import { colors } from '../../content-scripts/lib/colors';
 
 // const exampleStickyData = {
 //   'https://www.google.com/': {
@@ -27,28 +28,6 @@ const getDefaultStickySite = (stickies = []) => ({
   stickies,
 });
 
-const defaultSticky = {
-  pathname: window.location.pathname,
-  href: window.location.href,
-  id: new Date().getTime(),
-  initialX: 100,
-  initialY: 100,
-  initialHeight: 100,
-  initialWidth: 300,
-  initialText: '',
-  initialBgColor: colors.yellow,
-  initialIgnoreQueryParams: false,
-  // these start out undefined so they inherit parent's style
-  // fontStyle: 'sans-serif',
-  // fontSize: 1,
-};
-
-const getDefaultSticky = (partial = {}) => ({
-  ...defaultSticky,
-  id: new Date().getTime(),
-  ...partial,
-});
-
 export function getNewSticky(count, pathname, href) {
   const scroll = document.documentElement.scrollTop || document.body.scrollTop;
   const partial = {
@@ -70,7 +49,7 @@ export async function addNewSticky(url) {
     stickySite = {
       ...stickySite,
       stickies: [
-        ...stickySite.stickies.filter((el) => el.initialText),
+        ...stickySite.stickies,
         getNewSticky(stickySite.stickies.length, url.pathname, url.href),
       ],
     };
@@ -81,13 +60,22 @@ export async function addNewSticky(url) {
 
 export const matchesPageSpecificity = (
   sticky,
+  exampleInitialIgnoreQueryParams,
   currentPathOverride,
   currentHrefOverride
 ) => {
   const currentPath = currentPathOverride || window.location.pathname;
   const currentHref = currentHrefOverride || window.location.href;
-
-  return sticky.initialIgnoreQueryParams
+  const settingToUse =
+    sticky.initialIgnoreQueryParams === undefined
+      ? exampleInitialIgnoreQueryParams
+      : sticky.initialIgnoreQueryParams;
+  console.log({
+    exampleInitialIgnoreQueryParams,
+    settingToUse,
+    initialIgnoreQueryParams: sticky.initialIgnoreQueryParams,
+  });
+  return settingToUse
     ? sticky.pathname === currentPath
     : sticky.href === currentHref;
 };

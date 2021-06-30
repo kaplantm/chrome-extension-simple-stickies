@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "__MSG_extName__",
-  "homepage_url": "https://github.com/kaplantm",
+  "homepage_url": "https://github.com/kaplantm/chrome-extension-simple-stickies",
   "description": "A Simple Sticky Note Extension",
   "default_locale": "en",
   "permissions": ["activeTab", "storage"],

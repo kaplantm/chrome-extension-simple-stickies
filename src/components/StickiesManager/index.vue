@@ -1,9 +1,12 @@
 <template>
   <div class="stickyManagerOuterWrapper">
-    <!-- <h1>{{ showStickies }}</h1> -->
     <div class="stickyManagerWrapper" v-if="showStickies">
       <div v-for="item in initialStickies.stickies" :key="item.id">
-        <Sticky v-bind="item" :hostname="hostname" />
+        <Sticky
+          v-bind="item"
+          :hostname="hostname"
+          :exampleSticky="exampleSticky"
+        />
       </div>
     </div>
   </div>
@@ -15,6 +18,8 @@ import { addNewSticky, matchesPageSpecificity } from './helpers';
 import {
   getStickiesFromStorage,
   setItemInStorage,
+  optionsPageKey,
+  defaultSticky,
 } from '../../content-scripts/lib/storageUtils';
 
 export default {
@@ -23,59 +28,95 @@ export default {
   created() {
     this.setupListeners();
   },
+  props: {
+    showByDefault: Boolean,
+  },
   methods: {
     setupListeners() {
-      // setup listeners
-      chrome.runtime.onMessage.addListener(async (request) => {
-        const url = new URL(request.url);
-        // if (request.type === 'pageLoading') {
-        // this.showStickies = false;
-        // }
-        if (request.type === 'pageLoadingComplete') {
-          if (this.initOn !== url.href) {
-            this.initOn = url.href;
-            this.hostname = url.hostname;
-            this.initialize();
+      if (window.location.protocol === 'chrome-extension:') {
+        this.hostname = `simpleStickies${window.location.pathname}`;
+      } else {
+        // setup listeners
+        chrome.runtime.onMessage.addListener(async (request) => {
+          const url = new URL(request.url);
+          // if (request.type === 'pageLoading') {
+          // this.showStickies = false;
+          // }
+          if (request.type === 'pageLoadingComplete') {
+            if (this.initOn !== url.href) {
+              this.initOn = url.href;
+              this.hostname = url.hostname;
+              this.initialize();
+            }
           }
-        }
-        if (request.type === 'toggleStickies') {
-          // if notes are visible: get only non-empty notes for current page
-          const stickyData = await getStickiesFromStorage(url.hostname, true);
+          // TODO: now bug - removing jim query sticky when jim toggled off
+          if (request.type === 'toggleStickies') {
+            // if notes are visible: get only non-empty notes for current page
+            const stickyData = await getStickiesFromStorage(url.hostname, true);
+            const exampleStickyData = await getStickiesFromStorage(
+              optionsPageKey,
+              true
+            );
+            this.exampleSticky = exampleStickyData?.stickies?.length
+              ? exampleStickyData.stickies[0]
+              : defaultSticky;
 
-          const safeStickies = stickyData?.stickies || [];
-          /* eslint-disable */
-          const filteredStickyData = {
-            ...stickyData,
-            // if notes are visible: get only non-empty notes for current pagec
-            // else: get only non-empty notes and update storage to remove empty ones
-            stickies: safeStickies.filter((el) =>
-              matchesPageSpecificity(el, url.pathname, url.href)
-            ),
-          };
-          /* eslint-enable */
-          if (this.showStickies) {
-            await setItemInStorage(null, filteredStickyData);
+            const safeStickies = stickyData?.stickies || [];
+            /* eslint-disable */
+            const filteredStickyData = {
+              ...stickyData,
+              stickies: safeStickies.filter((el) =>
+                matchesPageSpecificity(
+                  el,
+                  this.exampleSticky.initialIgnoreQueryParams,
+                  url.pathname,
+                  url.href
+                )
+              ),
+            };
+            /* eslint-enable */
+
+            console.log('toggleStickies', this.showStickies);
+            // remove empty notes
+            await setItemInStorage(null, {
+              ...stickyData,
+              stickies: safeStickies.filter((el) => el.initialText),
+            });
+
+            this.initialStickies = filteredStickyData;
+            this.showStickies = !this.showStickies;
           }
-          this.initialStickies = filteredStickyData;
-          this.showStickies = !this.showStickies;
-        }
-        if (request.type === 'newSticky') {
-          const stickyData = await addNewSticky(url);
-          /* eslint-disable */
-          this.initialStickies = {
-            ...stickyData,
-            stickies: stickyData.stickies.filter((el) =>
-              matchesPageSpecificity(el, url.pathname, url.href)
-            ),
-          };
-          /* eslint-enable */
-          this.showStickies = true;
-        }
-      });
+          if (request.type === 'newSticky') {
+            const stickyData = await addNewSticky(url);
+            /* eslint-disable */
+            this.initialStickies = {
+              ...stickyData,
+              stickies: stickyData.stickies.filter((el) =>
+                matchesPageSpecificity(
+                  el,
+                  this.exampleSticky.initialIgnoreQueryParams,
+                  url.pathname,
+                  url.href
+                )
+              ),
+            };
+
+            /* eslint-enable */
+            this.showStickies = true;
+          }
+        });
+      }
       this.initialize();
     },
     initialize() {
-      this.showStickies = false;
+      this.showStickies = this.showByDefault || false;
+
+      getStickiesFromStorage(optionsPageKey, true).then((data) => {
+        console.log('getStickiesFromStorage optionsPageKey', data);
+        this.exampleSticky = data?.stickies?.length
+          ? data.stickies[0]
+          : defaultSticky;
+      });
       // get initial stickies asynchronously
       getStickiesFromStorage(this.hostname, true).then((data) => {
         this.initialStickies = data;
@@ -88,14 +129,29 @@ export default {
       showStickies: false,
       initOn: null,
       hostname: null,
+      exampleSticky: null,
     };
   },
 };
 </script>
 
-<style scoped>
+<style lang="scss">
 .stickyManagerOuterWrapper {
   z-index: 100000;
+  button {
+    cursor: pointer;
+    &:focus {
+      outline: none;
+    }
+  }
+  * {
+    line-height: unset;
+    letter-spacing: unset;
+    height: unset;
+    padding: unset;
+    min-width: unset;
+    max-width: unset;
+  }
 }
 .stickyManagerWrapper {
   position: absolute;

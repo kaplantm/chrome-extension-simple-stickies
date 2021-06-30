@@ -6,8 +6,8 @@
       :style="stickyStyle"
       :min-width="100"
       :min-height="100"
-      :w="width"
-      :h="height"
+      :w="width || this.exampleSticky.initialWidth"
+      :h="height || this.exampleSticky.initialHeight"
       :x="x"
       :y="y"
       :drag-handle="'.header'"
@@ -20,8 +20,6 @@
         <div v-if="showSettings">
           <SettingsPanel
             :updateNoteSettings="updateNoteSettings"
-            :hostname="hostname"
-            :pathname="pathname"
             :href="href"
             :initialBgColor="bgColor"
             :initialFontSize="fontSize"
@@ -60,6 +58,10 @@ import VueDraggableResizable from 'vue-draggable-resizable';
 import SettingsPanel from './SettingsPanel/index.vue';
 import { updateStoredStickyNote, removeStoredStickyNote } from './helpers';
 import { colors } from '../../content-scripts/lib/colors';
+import {
+  exampleStickyInitialText,
+  optionsPageKey,
+} from '../../content-scripts/lib/storageUtils';
 
 export default {
   name: 'Sticky',
@@ -78,7 +80,8 @@ export default {
     initialBgColor: String,
     initialIgnoreQueryParams: Boolean,
     initialFontSize: Number,
-    initialFontStyle: Boolean,
+    initialFontStyle: String,
+    exampleSticky: Object,
   },
   data() {
     return {
@@ -91,7 +94,7 @@ export default {
       bgColor: this.initialBgColor,
       settingsImg: chrome.runtime.getURL('assets/settings.svg'),
       showSettings: false,
-      ignoreQueryParams: this.initialIgnoreQueryParams || false,
+      ignoreQueryParams: this.initialIgnoreQueryParams,
       sizingActive: false,
       fontSize: this.initialFontSize,
       fontStyle: this.initialFontStyle,
@@ -100,17 +103,20 @@ export default {
   computed: {
     stickyStyle() {
       return {
-        'background-color': colors[this.bgColor] || colors.yellow,
+        'background-color':
+          colors[this.bgColor || this.exampleSticky.initialBgColor],
         top: 0,
         left: 0,
       };
     },
     stickyInputStyle() {
+      console.log({ exampleSticky: this.exampleSticky, bgColor: this.bgColor });
       return {
-        'background-color': colors[this.bgColor] || colors.yellow,
+        'background-color':
+          colors[this.bgColor || this.exampleSticky.initialBgColor],
         width: '100%',
-        'font-size': this.fontSize ? `${this.fontSize}em` : 'inherit',
-        'font-family': this.fontStyle || 'inherit',
+        'font-size': `${this.fontSize || this.exampleSticky.initialFontSize}em`,
+        'font-family': this.fontStyle || this.exampleSticky.initialFontStyle,
       };
     },
   },
@@ -147,8 +153,13 @@ export default {
       event.stopPropagation();
     },
     onMessageChange(event) {
-      this.message = event.target.value;
+      // if (this.hostname !== optionsPageKey) {
+      this.message =
+        this.hostname === optionsPageKey
+          ? exampleStickyInitialText
+          : event.target.value;
       this.syncStorage();
+      // }
     },
     updateNoteSettings(
       newIgnoreQueryParams,
@@ -168,6 +179,7 @@ export default {
       this.syncStorage();
     },
     syncStorage: debounce(function doDebounce() {
+      console.log('syncStorage', this.hostname);
       updateStoredStickyNote(
         {
           pathname: this.pathname,
@@ -226,8 +238,8 @@ $border-rad: 3px;
   background-color: hsla(0, 0%, 0%, 0.075);
   & button {
     cursor: pointer;
-    width: 12px;
-    height: 12px;
+    width: 12px !important;
+    height: 12px !important;
     margin: 2px;
     border-radius: 6px;
     padding: 0;

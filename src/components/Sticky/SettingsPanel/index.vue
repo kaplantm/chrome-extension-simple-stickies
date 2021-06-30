@@ -1,7 +1,5 @@
 <template>
   <div>
-    {{ initialFontSize }}<br />
-    {{ initialFontStyle }}
     <div class="v-padding color-options-container">
       <span>Background:&nbsp;</span>
       <div v-for="colorName in Object.keys(colorOptions)" :key="colorName">
@@ -51,7 +49,7 @@
           <span class="params-info"
             >Sticky will show on all pages with matching URL path</span
           ><br />
-          <div class="params-flex">
+          <div class="params-flex" v-if="notExtensionPage">
             <span class="params-info">URL:&nbsp;</span
             ><span class="params">{{ href }}</span>
           </div></span
@@ -78,9 +76,6 @@ import { fontStyles, fontSizes } from '../../../content-scripts/lib/fonts';
 export default {
   name: 'SettingsPanel',
   props: {
-    hostname: String,
-    // TODO: now custom fonts?
-    pathname: String,
     href: String,
     initialBgColor: String,
     initialIgnoreQueryParams: Boolean,
@@ -93,12 +88,9 @@ export default {
       fontStyles,
       fontSizes,
       colorOptions: colors,
-      hrefEnding: `/${this.href
-        .split('/')
-        .slice(3)
-        .join('/')}`,
       showAdvanced: false,
       ignoreQueryParams: this.initialIgnoreQueryParams,
+      notExtensionPage: !window.location.protocol.includes('chrome-extension'),
     };
   },
   computed: {

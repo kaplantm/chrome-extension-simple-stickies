@@ -13,15 +13,18 @@
     </button>
     <!-- <button class="popupButton" role="button" v-on:click="viewAll">
       View All Simple Stickies
-    </button>
+    </button> -->
     <button class="popupButton" role="button" v-on:click="options">
       Options
-    </button> -->
+    </button>
   </div>
 </template>
 
 <script>
-import { getStickiesFromStorage } from '../content-scripts/lib/storageUtils';
+import {
+  getStickiesFromStorage,
+  optionsPageKey,
+} from '../content-scripts/lib/storageUtils';
 import { matchesPageSpecificity } from './StickiesManager/helpers';
 
 export default {
@@ -33,13 +36,24 @@ export default {
 
       /* eslint-disable */
       getStickiesFromStorage(url.hostname, true).then((data) => {
-        const stickies = data?.stickies;
-        const hasStickies = stickies?.length
-          ? !!stickies.filter((el) =>
-              matchesPageSpecificity(el, url.pathname, url.href)
-            ).length
-          : false;
-        this.hasStickies = hasStickies;
+        getStickiesFromStorage(optionsPageKey, true).then((optionsPageData) => {
+          const exampleSticky = data?.stickies?.length
+            ? data.stickies[0]
+            : defaultSticky;
+          const stickies = data?.stickies;
+          const hasStickies = stickies?.length
+            ? !!stickies.filter((el) =>
+                matchesPageSpecificity(
+                  el,
+                  // TODO: initialIgnoreQueryParams is somehow getting set
+                  exampleSticky.initialIgnoreQueryParams,
+                  url.pathname,
+                  url.href
+                )
+              ).length
+            : false;
+          this.hasStickies = hasStickies;
+        });
       });
       /* eslint-enable */
 
@@ -83,9 +97,9 @@ export default {
     // viewAll: () => { // how to do this? local storage is site specific
     //   chrome.runtime.sendMessage({ type: 'tabUrl', data: './index.html' });
     // },
-    // options: () => {
-    //   chrome.runtime.sendMessage({ type: 'tabUrl', data: './options.html' });
-    // },
+    options: () => {
+      chrome.runtime.sendMessage({ type: 'tabUrl', data: './options.html' });
+    },
   },
 };
 </script>

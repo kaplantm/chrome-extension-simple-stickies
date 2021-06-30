@@ -12,10 +12,11 @@ export async function updateStoredStickyNote(sticky, key) {
   const stickiesClone = [...(stickyData?.stickies || [])];
   const index = stickiesClone.findIndex((val) => val.id === sticky.id);
   if (index === -1) {
-    return false;
+    stickiesClone.push(sticky);
+  } else {
+    stickiesClone[index] = sticky;
   }
-  stickiesClone[index] = sticky;
-  await setItemInStorage(null, { ...stickyData, stickies: stickiesClone });
+  await setItemInStorage(key, { ...stickyData, stickies: stickiesClone });
   return true;
 }
 
@@ -23,5 +24,5 @@ export async function removeStoredStickyNote(id, key) {
   const stickyData = await getStickiesFromStorage(key);
   const safeStickies = stickyData.stickies || [];
   const stickiesClone = safeStickies.filter((val) => val.id !== id);
-  await setItemInStorage(null, { ...stickyData, stickies: stickiesClone });
+  await setItemInStorage(key, { ...stickyData, stickies: stickiesClone });
 }

@@ -3,7 +3,32 @@
 // chrome.storage.local.get(console.log)
 // chrome.storage.local.clear()
 
+import { colors } from './colors';
+
 export const getDomainKey = () => window.location.hostname;
+export const optionsPageKey = 'simpleStickies/options.html';
+
+export const defaultSticky = {
+  pathname: window.location.pathname,
+  href: window.location.href,
+  id: new Date().getTime(),
+  initialX: 100,
+  initialY: 100,
+  initialHeight: 0,
+  initialWidth: 0,
+  initialText: '',
+  initialBgColor: '',
+  initialIgnoreQueryParams: undefined,
+  // these start out undefined so they inherit parent's style
+  // fontStyle: 'sans-serif',
+  // fontSize: 1,
+};
+
+export const getDefaultSticky = (partial = {}) => ({
+  ...defaultSticky,
+  id: new Date().getTime(),
+  ...partial,
+});
 
 export async function getItemInStorage(key) {
   const storageKey = key || getDomainKey();
@@ -15,17 +40,36 @@ export async function getItemInStorage(key) {
 }
 
 export async function setItemInStorage(key, value) {
+  console.log('setItemInStorage', { key, value });
   const storageKey = key || getDomainKey();
+  console.log('storageKey', { storageKey, key });
   return new Promise((resolve) => {
     chrome.storage.local.set({ [storageKey]: value }, () => {
       resolve(value);
     });
   });
 }
+// TODO: now sticky appearance messed up on android developers
+export const exampleStickyInitialText =
+  'Update the settings on this sticky to change the default note appearance. Toggle your open stickies to see your changes in effect.';
 
+const exampleSticky = getDefaultSticky({
+  initialText: exampleStickyInitialText,
+  initialHeight: 100,
+  initialWidth: 300,
+  initialIgnoreQueryParams: false,
+  initialBgColor: 'yellow',
+  fontStyle: 'sans-serif',
+  fontSize: 1,
+});
 export async function getStickiesFromStorage(key, omitEmpty) {
   const data = (await getItemInStorage(key)) || {};
-  const safeStickies = data.stickies || [];
+  let safeStickies = data.stickies || [];
+
+  if (!safeStickies.length && key === optionsPageKey) {
+    safeStickies = [exampleSticky];
+  }
+  console.log({ key });
   if (omitEmpty) {
     return {
       ...data,
