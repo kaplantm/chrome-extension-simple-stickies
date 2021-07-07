@@ -3,8 +3,6 @@
 // chrome.storage.local.get(console.log)
 // chrome.storage.local.clear()
 
-import { colors } from './colors';
-
 export const getDomainKey = () => window.location.hostname;
 export const optionsPageKey = 'simpleStickies/options.html';
 
@@ -18,7 +16,7 @@ export const defaultSticky = {
   initialWidth: 0,
   initialText: '',
   initialBgColor: '',
-  initialIgnoreQueryParams: undefined,
+  initialIgnoreQueryParams: 0, // 0 - unset, 1 - false, 2 - true
   // these start out undefined so they inherit parent's style
   // fontStyle: 'sans-serif',
   // fontSize: 1,
@@ -49,7 +47,7 @@ export async function setItemInStorage(key, value) {
     });
   });
 }
-// TODO: now sticky appearance messed up on android developers
+
 export const exampleStickyInitialText =
   'Update the settings on this sticky to change the default note appearance. Toggle your open stickies to see your changes in effect.';
 
@@ -57,7 +55,7 @@ const exampleSticky = getDefaultSticky({
   initialText: exampleStickyInitialText,
   initialHeight: 100,
   initialWidth: 300,
-  initialIgnoreQueryParams: false,
+  initialIgnoreQueryParams: 1,
   initialBgColor: 'yellow',
   fontStyle: 'sans-serif',
   fontSize: 1,

@@ -55,12 +55,13 @@
           </div></span
         >
       </div>
-      <p v-if="willHide" class="v-padding warning">
+      <p v-if="willHide && !disableAdvancedSubmit" class="v-padding warning">
         This sticky will no longer be shown on this page.
       </p>
       <button
-        :disabled="initialIgnoreQueryParams === ignoreQueryParams"
+        :disabled="disableAdvancedSubmit"
         v-on:click="onSavedAdvanced"
+        class="saveButton"
       >
         Save
       </button>
@@ -68,7 +69,6 @@
   </div>
 </template>
 
-<!-- TODO: sticky manager use page specificyty -->
 <script>
 import { colors } from '../../../content-scripts/lib/colors';
 import { fontStyles, fontSizes } from '../../../content-scripts/lib/fonts';
@@ -78,10 +78,11 @@ export default {
   props: {
     href: String,
     initialBgColor: String,
-    initialIgnoreQueryParams: Boolean,
+    initialIgnoreQueryParams: Number,
     updateNoteSettings: Function,
     initialFontSize: Number,
     initialFontStyle: String,
+    exampleSticky: Object,
   },
   data() {
     return {
@@ -89,13 +90,23 @@ export default {
       fontSizes,
       colorOptions: colors,
       showAdvanced: false,
-      ignoreQueryParams: this.initialIgnoreQueryParams,
+      ignoreQueryParams:
+        (this.initialIgnoreQueryParams ||
+          this.exampleSticky.initialIgnoreQueryParams) >= 2,
       notExtensionPage: !window.location.protocol.includes('chrome-extension'),
     };
   },
   computed: {
+    disableAdvancedSubmit() {
+      const disable =
+        (this.initialIgnoreQueryParams ||
+          this.exampleSticky.initialIgnoreQueryParams) >=
+          2 ===
+        this.ignoreQueryParams;
+      return disable;
+    },
     willHide() {
-      return this.ignoreQueryParams && window.location.href !== this.href;
+      return !this.ignoreQueryParams && window.location.href !== this.href;
     },
   },
   methods: {
@@ -103,7 +114,7 @@ export default {
       this.ignoreQueryParams = event.target.checked;
     },
     onSavedAdvanced() {
-      this.updateNoteSettings(this.ignoreQueryParams);
+      this.updateNoteSettings(this.ignoreQueryParams ? 2 : 1);
     },
     getBackgroundStyle(color) {
       return {
@@ -190,6 +201,7 @@ export default {
 }
 
 button {
+  border: 2px solid hsla(0, 0%, 0%, 0.1);
   cursor: pointer;
   border-radius: 6px;
   display: flex;

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!deleted">
+  <div v-if="!deleted && !hidden">
     <vue-draggable-resizable
       class="sticky"
       class-name-dragging="dragging-sticky"
@@ -25,6 +25,7 @@
             :initialFontSize="fontSize"
             :initialFontStyle="fontStyle"
             :initialIgnoreQueryParams="ignoreQueryParams"
+            :exampleSticky="exampleSticky"
           />
         </div>
       </div>
@@ -50,7 +51,6 @@
   </div>
 </template>
 
-<!-- TODO: sticky manager use page specificyty -->
 <script>
 import 'vue-draggable-resizable/dist/VueDraggableResizable.css';
 import debounce from 'lodash/debounce';
@@ -68,7 +68,6 @@ export default {
   components: { VueDraggableResizable, SettingsPanel },
   props: {
     hostname: String,
-    // TODO: now custom fonts?
     pathname: String,
     href: String,
     id: Number,
@@ -78,12 +77,19 @@ export default {
     initialWidth: Number,
     initialText: String,
     initialBgColor: String,
-    initialIgnoreQueryParams: Boolean,
+    initialIgnoreQueryParams: Number,
     initialFontSize: Number,
     initialFontStyle: String,
     exampleSticky: Object,
+    getStickies: Function,
   },
+
   data() {
+    console.log('sticky stickyData', {
+      message: this.initialText || '',
+      ignoreQueryParams: this.initialIgnoreQueryParams,
+      initialIgnoreQueryParams: this.initialIgnoreQueryParams,
+    });
     return {
       width: this.initialWidth,
       height: this.initialHeight,
@@ -101,6 +107,13 @@ export default {
     };
   },
   computed: {
+    hidden() {
+      console.log({
+        ig: this.ignoreQueryParams,
+        same: window.location.href !== this.href,
+      });
+      return this.ignoreQueryParams < 2 && window.location.href !== this.href;
+    },
     stickyStyle() {
       return {
         'background-color':
@@ -138,9 +151,6 @@ export default {
       // eslint-disable-next-line no-alert
       if (!this.message || window.confirm('Delete this note?') === true) {
         await removeStoredStickyNote(this.id, this.hostname);
-        chrome.runtime.sendMessage({
-          type: 'deleteSticky',
-        });
         this.deleted = true;
       }
     },

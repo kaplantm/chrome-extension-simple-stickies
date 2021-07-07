@@ -49,7 +49,6 @@ export default {
               this.initialize();
             }
           }
-          // TODO: now bug - removing jim query sticky when jim toggled off
           if (request.type === 'toggleStickies') {
             // if notes are visible: get only non-empty notes for current page
             const stickyData = await getStickiesFromStorage(url.hostname, true);
@@ -74,9 +73,9 @@ export default {
                 )
               ),
             };
+            console.log({ filteredStickyData });
             /* eslint-enable */
 
-            console.log('toggleStickies', this.showStickies);
             // remove empty notes
             await setItemInStorage(null, {
               ...stickyData,
@@ -110,7 +109,9 @@ export default {
     },
     initialize() {
       this.showStickies = this.showByDefault || false;
-
+      this.getStickies();
+    },
+    getStickies() {
       getStickiesFromStorage(optionsPageKey, true).then((data) => {
         console.log('getStickiesFromStorage optionsPageKey', data);
         this.exampleSticky = data?.stickies?.length
@@ -147,7 +148,6 @@ export default {
   * {
     line-height: unset;
     letter-spacing: unset;
-    height: unset;
     padding: unset;
     min-width: unset;
     max-width: unset;
