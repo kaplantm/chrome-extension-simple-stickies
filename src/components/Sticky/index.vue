@@ -10,7 +10,7 @@
       :h="height || this.exampleSticky.initialHeight"
       :x="x"
       :y="y"
-      :drag-handle="'.header'"
+      :drag-handle="'.drag-handle'"
       @dragging="onDrag"
       @resizing="onResize"
       :handles="['tl', 'tr', 'br', 'bl']"
@@ -29,15 +29,17 @@
           />
         </div>
       </div>
-      <div class="header">
+      <div :class="readOnly ? 'header' : 'header drag-handle'">
         <button class="delete" v-on:click="onDelete" v-on:mousedown="blocker" />
         <button
+          v-if="!readOnly"
           class="settings"
           v-on:click="onSettingsClick"
           v-on:mousedown="blocker"
         >
           <img :src="settingsImg" alt="settings" width="100%" />
         </button>
+        <a :href="href" v-if="readOnly" target="_blank" title="Open Page" />
       </div>
       <textarea
         :value="message"
@@ -45,12 +47,14 @@
         placeholder="Add some notes"
         class="stickyInput"
         :style="stickyInputStyle"
+        :disabled="readOnly"
         v-on:click="disabledSizingActive"
       />
     </vue-draggable-resizable>
   </div>
 </template>
 
+<!-- TODO: now if read one, setting panel just shows link to href -->
 <script>
 import 'vue-draggable-resizable/dist/VueDraggableResizable.css';
 import debounce from 'lodash/debounce';
@@ -82,14 +86,10 @@ export default {
     initialFontStyle: String,
     exampleSticky: Object,
     getStickies: Function,
+    readOnly: Boolean,
   },
 
   data() {
-    console.log('sticky stickyData', {
-      message: this.initialText || '',
-      ignoreQueryParams: this.initialIgnoreQueryParams,
-      initialIgnoreQueryParams: this.initialIgnoreQueryParams,
-    });
     return {
       width: this.initialWidth,
       height: this.initialHeight,
@@ -108,11 +108,11 @@ export default {
   },
   computed: {
     hidden() {
-      console.log({
-        ig: this.ignoreQueryParams,
-        same: window.location.href !== this.href,
-      });
-      return this.ignoreQueryParams < 2 && window.location.href !== this.href;
+      return (
+        !this.readOnly &&
+        this.ignoreQueryParams < 2 &&
+        window.location.href !== this.href
+      );
     },
     stickyStyle() {
       return {
@@ -123,7 +123,6 @@ export default {
       };
     },
     stickyInputStyle() {
-      console.log({ exampleSticky: this.exampleSticky, bgColor: this.bgColor });
       return {
         'background-color':
           colors[this.bgColor || this.exampleSticky.initialBgColor],
@@ -189,30 +188,32 @@ export default {
       this.syncStorage();
     },
     syncStorage: debounce(function doDebounce() {
-      console.log('syncStorage', this.hostname);
-      updateStoredStickyNote(
-        {
-          pathname: this.pathname,
-          href: this.href,
-          id: this.id,
-          initialX: this.x,
-          initialY: this.y,
-          initialHeight: this.height,
-          initialWidth: this.width,
-          initialText: this.message,
-          initialBgColor: this.bgColor,
-          initialIgnoreQueryParams: this.ignoreQueryParams,
-          initialFontSize: this.fontSize,
-          initialFontStyle: this.fontStyle,
-        },
-        this.hostname
-      );
+      if (!this.readOnly) {
+        updateStoredStickyNote(
+          {
+            pathname: this.pathname,
+            href: this.href,
+            id: this.id,
+            initialX: this.x,
+            initialY: this.y,
+            initialHeight: this.height,
+            initialWidth: this.width,
+            initialText: this.message,
+            initialBgColor: this.bgColor,
+            initialIgnoreQueryParams: this.ignoreQueryParams,
+            initialFontSize: this.fontSize,
+            initialFontStyle: this.fontStyle,
+          },
+          this.hostname
+        );
+      }
     }, 1000),
     disabledSizingActive() {
       this.sizingActive = false;
     },
   },
 };
+/* eslint-disable */
 </script>
 
 <style scoped lang="scss">
@@ -235,7 +236,6 @@ $border-rad: 3px;
   opacity: 0.65;
 }
 .header {
-  cursor: move;
   border-top-left-radius: $border-rad;
   border-top-right-radius: $border-rad;
   border: 2px solid hsla(0, 0%, 0%, 0.05);
@@ -257,6 +257,18 @@ $border-rad: 3px;
     align-items: center;
     justify-content: center;
   }
+  & a {
+    color: black;
+  }
+}
+
+a[target='_blank']::after {
+  content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+  margin: 0 3px 0 5px;
+}
+
+.drag-handle {
+  cursor: move;
 }
 .settings {
   background-color: transparent;

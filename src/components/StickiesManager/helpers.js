@@ -25,7 +25,8 @@ export function getNewSticky(count, pathname, href) {
 }
 
 export async function addNewSticky(url) {
-  let stickySite = await getItemInStorage(url.domain);
+  console.log({ url });
+  let stickySite = await getItemInStorage(url.hostname);
   if (!stickySite?.id) {
     stickySite = getDefaultStickySite([
       getNewSticky(0, url.pathname, url.href),
@@ -39,8 +40,7 @@ export async function addNewSticky(url) {
       ],
     };
   }
-  console.log({ stickySite });
-  await setItemInStorage(null, stickySite);
+  await setItemInStorage(window.location.hostname, stickySite);
   return stickySite;
 }
 
@@ -56,18 +56,6 @@ export const matchesPageSpecificity = (
     sticky.initialIgnoreQueryParams === 0
       ? exampleInitialIgnoreQueryParams
       : sticky.initialIgnoreQueryParams;
-  console.log({
-    exampleInitialIgnoreQueryParams,
-    settingToUse,
-    currentPathOverride,
-    currentHrefOverride,
-    initialIgnoreQueryParams: sticky.initialIgnoreQueryParams,
-    match:
-      settingToUse >= 2
-        ? sticky.pathname === currentPath
-        : sticky.href === currentHref,
-    sticky,
-  });
   return settingToUse >= 2
     ? sticky.pathname === currentPath
     : sticky.href === currentHref;

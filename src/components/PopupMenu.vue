@@ -8,12 +8,17 @@
     >
       Toggle Stickies
     </button>
-    <button class="popupButton" role="button" v-on:click="newSticky">
+    <button
+      class="popupButton"
+      role="button"
+      v-on:click="newSticky"
+      v-if="allowNewStickies"
+    >
       New Sticky
     </button>
-    <!-- <button class="popupButton" role="button" v-on:click="viewAll">
-      View All Simple Stickies
-    </button> -->
+    <button class="popupButton" role="button" v-on:click="viewAll">
+      View All Stickies
+    </button>
     <button class="popupButton" role="button" v-on:click="options">
       Options
     </button>
@@ -33,6 +38,7 @@ export default {
     // get initial stickies asynchronously
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const url = new URL(tabs[0].url);
+      this.allowNewStickies = !url.protocol.includes('chrome-extension');
 
       /* eslint-disable */
       getStickiesFromStorage(url.hostname, true).then((data) => {
@@ -67,6 +73,7 @@ export default {
   data() {
     return {
       hasStickies: false,
+      allowNewStickies: true,
     };
   },
   methods: {
@@ -89,9 +96,10 @@ export default {
       });
       window.close();
     },
-    // viewAll: () => { // how to do this? local storage is site specific
-    //   chrome.runtime.sendMessage({ type: 'tabUrl', data: './index.html' });
-    // },
+    viewAll: () => {
+      // how to do this? local storage is site specific
+      chrome.runtime.sendMessage({ type: 'tabUrl', data: './index.html' });
+    },
     options: () => {
       chrome.runtime.sendMessage({ type: 'tabUrl', data: './options.html' });
     },

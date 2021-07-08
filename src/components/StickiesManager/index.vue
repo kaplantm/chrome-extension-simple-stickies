@@ -19,7 +19,7 @@ import {
   getStickiesFromStorage,
   setItemInStorage,
   optionsPageKey,
-  defaultSticky,
+  exampleSticky,
 } from '../../content-scripts/lib/storageUtils';
 
 export default {
@@ -58,7 +58,7 @@ export default {
             );
             this.exampleSticky = exampleStickyData?.stickies?.length
               ? exampleStickyData.stickies[0]
-              : defaultSticky;
+              : exampleSticky;
 
             const safeStickies = stickyData?.stickies || [];
             /* eslint-disable */
@@ -73,11 +73,10 @@ export default {
                 )
               ),
             };
-            console.log({ filteredStickyData });
             /* eslint-enable */
 
             // remove empty notes
-            await setItemInStorage(null, {
+            await setItemInStorage(window.location.hostname, {
               ...stickyData,
               stickies: safeStickies.filter((el) => el.initialText),
             });
@@ -113,10 +112,9 @@ export default {
     },
     getStickies() {
       getStickiesFromStorage(optionsPageKey, true).then((data) => {
-        console.log('getStickiesFromStorage optionsPageKey', data);
         this.exampleSticky = data?.stickies?.length
           ? data.stickies[0]
-          : defaultSticky;
+          : exampleSticky;
       });
       // get initial stickies asynchronously
       getStickiesFromStorage(this.hostname, true).then((data) => {
@@ -129,7 +127,7 @@ export default {
       initialStickies: { stickies: [] },
       showStickies: false,
       initOn: null,
-      hostname: null,
+      hostname: window.location.hostname,
       exampleSticky: null,
     };
   },

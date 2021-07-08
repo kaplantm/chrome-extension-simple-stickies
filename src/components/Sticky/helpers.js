@@ -5,6 +5,7 @@ import {
 } from '../../content-scripts/lib/storageUtils';
 
 export async function updateStoredStickyNote(sticky, key) {
+  console.log({ key });
   const stickyData = await getStickiesFromStorage(key);
   if (!stickyData) {
     return false; // TODO: error handling

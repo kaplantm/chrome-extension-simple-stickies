@@ -136,7 +136,6 @@ export default {
     },
 
     onFontSizeChange(size) {
-      console.log('onFontSizeChange', size);
       this.updateNoteSettings(undefined, undefined, size);
     },
     onFontStyleChange(style) {

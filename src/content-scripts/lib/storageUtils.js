@@ -3,7 +3,7 @@
 // chrome.storage.local.get(console.log)
 // chrome.storage.local.clear()
 
-export const getDomainKey = () => window.location.hostname;
+// export const getDomainKey = () => window.location.hostname;
 export const optionsPageKey = 'simpleStickies/options.html';
 
 export const defaultSticky = {
@@ -29,18 +29,16 @@ export const getDefaultSticky = (partial = {}) => ({
 });
 
 export async function getItemInStorage(key) {
-  const storageKey = key || getDomainKey();
+  const storageKey = key;
   return new Promise((resolve) => {
     chrome.storage.local.get(storageKey, (data) => {
-      resolve(data ? data[storageKey] : data);
+      resolve(data && storageKey ? data[storageKey] : data);
     });
   });
 }
 
 export async function setItemInStorage(key, value) {
-  console.log('setItemInStorage', { key, value });
-  const storageKey = key || getDomainKey();
-  console.log('storageKey', { storageKey, key });
+  const storageKey = key;
   return new Promise((resolve) => {
     chrome.storage.local.set({ [storageKey]: value }, () => {
       resolve(value);
@@ -51,7 +49,7 @@ export async function setItemInStorage(key, value) {
 export const exampleStickyInitialText =
   'Update the settings on this sticky to change the default note appearance. Toggle your open stickies to see your changes in effect.';
 
-const exampleSticky = getDefaultSticky({
+export const exampleSticky = getDefaultSticky({
   initialText: exampleStickyInitialText,
   initialHeight: 100,
   initialWidth: 300,
@@ -60,6 +58,7 @@ const exampleSticky = getDefaultSticky({
   fontStyle: 'sans-serif',
   fontSize: 1,
 });
+
 export async function getStickiesFromStorage(key, omitEmpty) {
   const data = (await getItemInStorage(key)) || {};
   let safeStickies = data.stickies || [];
@@ -67,7 +66,7 @@ export async function getStickiesFromStorage(key, omitEmpty) {
   if (!safeStickies.length && key === optionsPageKey) {
     safeStickies = [exampleSticky];
   }
-  console.log({ key });
+
   if (omitEmpty) {
     return {
       ...data,
